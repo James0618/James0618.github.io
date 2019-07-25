@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-07-25T19:01:59+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">Test Jekyll</title><link href="http://localhost:4000/2019/07/25/test-jekyll.html" rel="alternate" type="text/html" title="Test Jekyll" /><published>2019-07-25T00:00:00+08:00</published><updated>2019-07-25T00:00:00+08:00</updated><id>http://localhost:4000/2019/07/25/test-jekyll</id><content type="html" xml:base="http://localhost:4000/2019/07/25/test-jekyll.html">&lt;blockquote&gt;
+  &lt;p&gt;Transform your plain text into static websites and blogs.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;welcome&quot;&gt;Welcome&lt;/h1&gt;
+
+&lt;h2 id=&quot;welcome-1&quot;&gt;Welcome&lt;/h2&gt;
+
+&lt;h3 id=&quot;welcome-2&quot;&gt;Welcome&lt;/h3&gt;
+
+&lt;p&gt;This site aims to be a comprehensive guide to Jekyll. We’ll cover topics such as getting your site up and running, creating and managing your content, customizing the way your site works and looks, deploying to various environments, and give you some advice on participating in the future development of Jekyll itself.&lt;/p&gt;
+
+&lt;h3 id=&quot;so-what-is-jekyll-exactlypermalink&quot;&gt;So what is Jekyll, exactly?Permalink&lt;/h3&gt;
+
+&lt;p&gt;Jekyll is a simple, blog-aware, static site generator. It takes a template directory containing raw text files in various formats, runs it through a converter (like &lt;a href=&quot;https://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;) and our &lt;a href=&quot;https://github.com/Shopify/liquid/wiki&quot;&gt;Liquid&lt;/a&gt; renderer, and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. Jekyll also happens to be the engine behind GitHub Pages, which means you can use Jekyll to host your project’s page, blog, or website from GitHub’s servers for free.&lt;/p&gt;
+
+&lt;h3 id=&quot;helpful-hintspermalink&quot;&gt;Helpful HintsPermalink&lt;/h3&gt;
+
+&lt;p&gt;Throughout this guide there are a number of small-but-handy pieces of information that can make using Jekyll easier, more interesting, and less hazardous. Here’s what to look out for.&lt;/p&gt;
+
+&lt;h3 id=&quot;video-test&quot;&gt;Video Test&lt;/h3&gt;
+
+&lt;iframe type=&quot;text/html&quot; width=&quot;100%&quot; height=&quot;385&quot; src=&quot;http://www.youtube.com/embed/gfmjMWjn-Xg&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</content><author><name>James</name></author><category term="test" /><summary type="html">Transform your plain text into static websites and blogs. Welcome Welcome Welcome This site aims to be a comprehensive guide to Jekyll. We’ll cover topics such as getting your site up and running, creating and managing your content, customizing the way your site works and looks, deploying to various environments, and give you some advice on participating in the future development of Jekyll itself. So what is Jekyll, exactly?Permalink Jekyll is a simple, blog-aware, static site generator. It takes a template directory containing raw text files in various formats, runs it through a converter (like Markdown) and our Liquid renderer, and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. Jekyll also happens to be the engine behind GitHub Pages, which means you can use Jekyll to host your project’s page, blog, or website from GitHub’s servers for free. Helpful HintsPermalink Throughout this guide there are a number of small-but-handy pieces of information that can make using Jekyll easier, more interesting, and less hazardous. Here’s what to look out for. Video Test</summary></entry><entry><title type="html">LOAM论文研读</title><link href="http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html" rel="alternate" type="text/html" title="LOAM论文研读" /><published>2019-07-25T00:00:00+08:00</published><updated>2019-07-25T00:00:00+08:00</updated><id>http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB</id><content type="html" xml:base="http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html">&lt;h1 id=&quot;loam论文研读&quot;&gt;LOAM论文研读&lt;/h1&gt;
+
+&lt;p&gt;​		下面让我们从3D激光SLAM的常用算法LOAM来入手，从提出这个算法的论文开始逐步剖析，了解3D激光SLAM面临的困难及解决方案。&lt;/p&gt;
+&lt;h2 id=&quot;摘要&quot;&gt;摘要&lt;/h2&gt;
+&lt;p&gt;​		首先在提出LOAM算法的论文（Low-drift and Real-time Lidar Odom and Mapping）中，作者提出了一种仅使用在六自由度环境下移动的3D激光雷达获取到的数据进行实时、低漂移的里程计和建图算法。实际上，这个问题并没有描述中的那么简单，由于激光雷达这个传感器结构的特殊性，其数据是在不同时刻采集到的，因此会导致点云数据的错误配准进而影响建图。为了解决这些问题，大多数3D激光SLAM算法都会进行回环检测来减少传感器带来的累计漂移，但是在LOAM中并没有回环检测这一手段，而是将SLAM问题拆分为两个子算法：里程计和建图。前者以较高的频率但是较低的精度实现对激光雷达的速度估计，而后者则以较前一个算法的频率低一个数量级的频率对激光雷达的数据进行匹配和点云的配准，通过这两个算法的结合就能实现实时建图的任务。算法的流程图如下所示：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/算法流程图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图1  LOAM算法流程图 &lt;/div&gt;
+
+&lt;h2 id=&quot;符号说明&quot;&gt;符号说明&lt;/h2&gt;
+
+&lt;p&gt;​		接下来将会出现一系列的公式和符号，为了不产生混淆我们先在此进行介绍，之后的讲解中如有不理解的仍然会停下来进行说明，不过为了能够更快的继续我的们的课程，提前进行符号说明是必须的：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;$P^{k}$：表示在第$k$次扫描时获取到的点云数据&lt;/p&gt;
+
+  &lt;p&gt;$X_{k,i}^{L}$：表示在第$k$次扫描时，在激光雷达坐标系{$L$}下的一个点$i$&lt;/p&gt;
+
+  &lt;p&gt;$X_{k,i}^{W}$：表示在第$k$次扫描时，在世界坐标系{$W$}下的一个点$i$&lt;/p&gt;
+
+  &lt;p&gt;$T_{k}^{L}(t)$：表示在时刻$t$将一个点映射到第k次扫描起始时的坐标系下的变换（由于运动畸变）&lt;/p&gt;
+
+  &lt;p&gt;$T_{k}^{W}(t)$：表示在时刻$t$将一个点映射到世界坐标系下的变换&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;激光里程计&quot;&gt;激光里程计&lt;/h2&gt;
+
+&lt;h3 id=&quot;特征点选取&quot;&gt;特征点选取&lt;/h3&gt;
+
+&lt;p&gt;​		和许多SLAM算法一样，LOAM算法也使用特征点来计算坐标变换矩阵，因此我们的第一步便是从激光雷达获取到的点云中提取特征点，在LOAM中将特征点分为了两类：边缘点(Edge points)和平面点(Planar Points)。下面我们将会介绍如何在点云中提取这两类特征点。&lt;/p&gt;
+
+&lt;p&gt;​		提取特征点的依据是这个点的曲率，选取在点云$P_{k}$中的点$i$，设集合$S$为与点$i$相邻的点的集合，那么点$i$处的曲率可以由下式得到：
+&lt;script type=&quot;math/tex&quot;&gt;c=\frac{1}{|S|\cdot||X_{(k,i)}^{L}||}||\sum_{j\in S,j\ne i}(X_{(k,i)}^{L}-X_{(k,j)}^{L})||&lt;/script&gt;
+​		在实际应用中我们通常使用点$i$周围几个点来计算该点的曲率，得到了曲率后我们根据$c$值对各点进行排序，其中$c$值最大的被选为边缘点而最小的被选为平面点。在论文中，作者为了让特征点能够在全空间内分布的更加均匀，将每一次扫描分为四个子区域，每一个子区域最多可以提供2个边缘特征点和4个平面特征点，而且均需要和阈值$5\times10^{-3}$进行比较才能确定是否为特征点。&lt;/p&gt;
+
+&lt;p&gt;​		除此之外，由于传感器的数据不可能是完全精确的而且现实的环境又是多种多样极其复杂的，在选取特征点的时候需要避开可能造成错误的特征点，在LOAM中就对特征点的选取给出了限制：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;特征点的数量不应该超过子区域对特征点数量的限制&lt;/p&gt;
+
+  &lt;p&gt;应避免在已经被选择的点周围再次选择特征点&lt;/p&gt;
+
+  &lt;p&gt;特征点不应该选取在和雷达平面的夹角在$10^{\circ}$以内平面上&lt;/p&gt;
+
+  &lt;p&gt;特征点不应该选取在被遮挡的平面上&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;​		最主要的也最值得解释的是后两点限制，这两种情况的示意图如下图所示：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/特征点选取示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图2 特征点选取示意图 &lt;/div&gt;
+
+&lt;p&gt;​		在第一种情况下，需要通过$S$中的点构成的平面来计算和激光雷达平面的角度；而在第二种情况下，则需要对点$i$附近的点中是否存在与其相隔很远的点来进行检查，如果存在这样的点则说明点$i$是在被遮挡着的平面上（即上图中的C、D点），特征点提取的结果如图下所示，其中黄色的点表示边缘点而红色则表示平面点。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/特征点选取示意图2.png&quot; width=&quot;50%&quot; height=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图3 特征点选取结果示意图 &lt;/div&gt;
+
+&lt;h3 id=&quot;特征点匹配&quot;&gt;特征点匹配&lt;/h3&gt;
+
+&lt;p&gt;​		里程计算法用于估计激光雷达在一次扫描中的运动，我们设$t_{k}$为第$k$次扫描的起始时间，在第$k-1$次扫描的最后时刻将这一次扫描中采集到的点云数据映射到时间戳$t_{k}$上，这些被映射过的点云被记为$\overline{P}&lt;em&gt;{k-1}$，在第$k$次扫描中这部分数据和在第$k$次扫描时逐渐采集到的点云数据$P&lt;/em&gt;{k}$一起估计激光雷达的运动。&lt;/p&gt;
+
+&lt;p&gt;​		在这一部分中我们不考虑如何对点云进行映射，我们将在下一部分介绍如何得到所需的变换阵。我们设在点云集合$P_{k}$中边缘特征点的集合为$\varepsilon_{k}$，平面特征点的集合为$\mathcal{H}&lt;em&gt;{k}$，我们接下来就需要在$\overline{P}&lt;/em&gt;{k-1}$中寻找和这两个集合中元素匹配的点。需要注意的是在第$k$次扫描刚开始时，上述的集合都还是空集合，随着扫描时间的增加特征点的数量逐渐增加，因此我们需要将特征点映射到第$k$次扫描的起始时刻$t_{k}$，设映射后的点集为$\tilde\varepsilon_{k}$和$\tilde{\mathcal{H}}&lt;em&gt;{k}$。对于映射后的集合中的每一个元素，在$\overline{P}&lt;/em&gt;{k-1}$中寻找最近邻的点，其中$\overline{P}_{k-1}$是通过$KD-tree$进行储存的。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;首先介绍边缘特征点如何进行匹配。对于在集合$\tilde\varepsilon_{k}$中的边缘特征点$i$首先在$\overline{P}_{k-1}$中寻找它的最近邻点$j$，之后在这个近邻点$j$所在的扫描面的前后两个扫描面上寻找与$i$最近邻的点$l$。那么边缘特征点的匹配就可以使用元组$(j,l)$来进行表示，但是这两个点都需要满足$c&amp;gt;5\times10^{-3}$的条件。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;接下来介绍平面特征点如何进行匹配。对于在集合$\tilde{\mathcal{H}}&lt;em&gt;{k}$中的平面特征点$i$首先在$\overline{P}&lt;/em&gt;{k-1}$中寻找它的最近邻点$j$，之后再寻找两个近邻点用来表示平面特征点的匹配，这两个点的其中一个是在这个近邻点$j$所在的扫描面选择的除点$j$之外的另一个近邻点，另一个是在其前后两个扫描面上选择的一个近邻点。那么平面特征点的匹配就可以使用元组$(j,l,m)$来进行表示。之所以这样选取是为了保证这三个一定是不共线的，当然和边缘特征点匹配中一样，同样需要保证这三个点满足$c&amp;lt;5\times10^{-3}$的条件。特征点匹配的示意图如下所示：&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/特征点匹配示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图4 特征点匹配示意图 &lt;/div&gt;
+
+&lt;p&gt;​		获得了匹配好的特征点后，我们可以通过特征点和与其匹配的边缘或平面之间的距离来对变换矩阵进行优化，具体的计算方式如下所示：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;边缘特征点和对应边缘之间的距离可以通过外积来求得。下式中的分子部分表示的是由$\vec{ij}$和$\vec{il}$为边组成的平行四边形的面积，而分子则表示$\vec{jl}$的长度，最终的结果便是点$i$到点$j$和$l$表示的边缘的距离：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;d\varepsilon=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\times(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,l)}^{L})|}{|\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L}|}&lt;/script&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;平面特征点和对应平面之间的距离可以通过混合积来求得。下式中的分子部分表示的是由$\vec{jm}$、$\vec{jl}$和$\vec{ji}$为边组成的平行六面体的体积，而分子则表示底面的面积，最终的结果便是点$i$到底面的距离：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;d_{\mathcal{H}}=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\cdot((\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L}))|}{|(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L})|}&lt;/script&gt;
+
+&lt;p&gt;​		注意其中$X$上边符号的不同，$\tilde{}$表示的是在$\tilde{P_{k}}$中获得到的特征点，而$\bar{}$则表示的是在$\bar{P}_{k-1}$中获得到的前一次扫描中的特征点。&lt;/p&gt;
+
+&lt;h3 id=&quot;动作估计&quot;&gt;动作估计&lt;/h3&gt;
+
+&lt;p&gt;​		在这一部分中我们就开始介绍之前没有进行的动作估计，也就是获得在第$k$次扫描时的变换矩阵，这个变换矩阵是一个随时间发生变化的矩阵$T_{k}^{L}(t)$。这个变换矩阵表征了六个自由度上的变化，可以被拆分成两个部分，分别是旋转变换和平移变换：$T_{k}^{L}(t)=[\tau_{k}^{L}(t),\theta_{k}^{L}(t)]^{T}$，其中$\tau_{k}^{L}(t)=[t_x,t_y,t_z]^T$，$\theta_{k}^{L}(t)=[\theta_x,\theta_y,\theta_z]^T$。可以使用罗德里格斯公式来计算对应的旋转矩阵：
+&lt;script type=&quot;math/tex&quot;&gt;R_{k}^{L}(t)=e^{\hat{\theta}_{k}^{L}(t)}=I+\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||}sin||\theta_{k}^{L}(t)||+(\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||})^2(1-||cos\theta_{k}^{L}(t)||)&lt;/script&gt;
+​		其中$\hat{\theta}&lt;em&gt;{k}^{L}(t)$表示$\theta&lt;/em&gt;{k}^{L}(t)$的反对称矩阵，如果不清楚可以稍后随意查一下就行，或者只需要知道这是一个由$\theta_{k}^{L}(t)$中的元素组成的矩阵即可。得到了旋转矩阵后便可以使用获取到的点云数据将其映射回当前扫描的起始时刻$t_k$：
+&lt;script type=&quot;math/tex&quot;&gt;\tilde{X}_{(k,i)}^{L}=R_{(k,i)}^{L}X_{(k,i)}^{L}+\tau_{(k,i)}^{L}&lt;/script&gt;
+​		不知道大家还记不记得之前计算特征点和边缘与平面之间距离的公式，将上式与那两个公式联系起来便能简化成以下形式：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;$f_{\varepsilon}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d\varepsilon,　i\in\varepsilon_{k}$&lt;/li&gt;
+  &lt;li&gt;$f_{\mathcal{H}}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d_{\mathcal{H}},　i\in\mathcal{H}_{k}$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;​		将上式进行统一即可得到以下的公式，我们可以使用列文伯格-马夸尔特优化算法不断地进行优化直至收敛或达到预设的迭代次数，进而得到期望的变换矩阵$T_{k}^{L}(t)$：
+&lt;script type=&quot;math/tex&quot;&gt;f(T_{k}^{L}(t))=d&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;T_k^L(t)\leftarrow T_k^L(t)-(J^TJ+\lambda diag(J^TJ))^{-1}J^Td&lt;/script&gt;
+
+&lt;p&gt;​		其中$J$为$f$对$T_k^L(t)$计算得到的$Jacobian$矩阵，$\lambda$是由列文伯格-马夸尔特算法决定的因子。&lt;/p&gt;
+
+&lt;h3 id=&quot;激光里程计的整体算法&quot;&gt;激光里程计的整体算法&lt;/h3&gt;
+
+&lt;p&gt;​		下面是我们刚才叙述的激光里程计算法的汇总，可以看到在第$k$次扫描时的输入为上一次扫描获得的点云映射在$t_k$时刻之后的结果，当前扫描获取到的点云信息和初始变换矩阵。按照刚刚讲解的顺序，先是从点云数据中提取了边缘特征点和平面特征点，之后又使用非线性优化方法对变换矩阵进行计算，当结束本次扫描后再将本次扫描获取到的点云数据使用上一步中计算得到的变换矩阵将点云数据映射到$t_{k+1}$时刻上，最后结束本次扫描并返回变换矩阵。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/激光里程计算法.png&quot; width=&quot;65%&quot; height=&quot;65%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图5 激光里程计算法 &lt;/div&gt;
+
+&lt;h2 id=&quot;激光建图&quot;&gt;激光建图&lt;/h2&gt;
+
+&lt;p&gt;​		激光建图的整个流程和激光里程计实质上并没有什么差别，只不过我们需要进行匹配的点云是地图点云$Q_{k-1}$而已。在下图中黑色部分的是已经建好的地图中的点云，绿色部分是我们在第$k$次扫描时获取到的点云数据映射到世界坐标系${W}$下的结果，蓝色的轨迹线是在第$k$次扫描以前激光雷达的运动轨迹，而橙色的轨迹线则表示在第$k$次扫描时激光雷达运动的轨迹。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../25/建图示意图.png&quot; width=&quot;65%&quot; height=&quot;65%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt; 图6 建图示意图 &lt;/div&gt;
+
+&lt;p&gt;​		在建图中，由于采用更低的频率，我们也可以选择更多的特征点数，在论文中作者选择了十倍于里程计算法的特征点数，但是选择特征点的方式和依据没有改变。在建图中我们需要通过优化算法计算的主要是将激光雷达位姿映射到世界坐标系的变换$T_k^W(t)$，将之前用于优化的公式中的所有$T_k^L(t)$替换为$T_k^W(t)$并把在$P_k$中出现的点替换为在$Q_{k}$中出现的点即可：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;$f_{\varepsilon}(Q_{(k,i)}(t),T_{k}^{W}(t))=d\varepsilon,　i\in\varepsilon_{k}$&lt;/li&gt;
+  &lt;li&gt;$f_{\mathcal{H}}(Q_{(k,i)}(t),T_{k}^{L}(t))=d_{\mathcal{H}},　i\in\mathcal{H}_{k}$&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;​		之后仍然是使用列文伯格-马夸尔特算法进行优化实现建图操作，至此我们的论文解析就结束了，在LOAM中仅使用了激光雷达的点云数据，通过两个子算法激光里程计和激光建图实现了低漂移的3D激光SLAM。&lt;/p&gt;</content><author><name>James</name></author><category term="3D_SLAM" /><summary type="html">LOAM论文研读</summary></entry></feed>

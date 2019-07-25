@@ -1,0 +1,433 @@
+<!-- 博文的布局-Layout -->
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 引入head标签 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-sclable=0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="这是一个初学博客的博主" />
+<meta name="keywords" content="Robot, Artificial Intelligent, Diary" />
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/media.css">
+<link rel="stylesheet" href="/assets/css/animate.min.css">
+<link rel="stylesheet" href="/assets/css/pygments/pygments_default.css">
+<link rel="stylesheet" href="/assets/css/github-markdown.css">
+<!-- SNS-icon -->
+<script src="//at.alicdn.com/t/font_856428_y9z6nq7zf5.js"></script>
+<!-- share.css -->
+<link rel="stylesheet" href="/assets/css/share.min.css">
+<!-- font -->
+<link rel="stylesheet" href="/assets/css/font.css">
+<!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
+
+<!-- Favicon -->
+<link href="/assets/profile.jpeg" rel="shortcut icon" />
+<link href="/assets/profile.jpeg" rel="apple-touch-icon-precomposed" />
+<!-- Android Lolipop Theme Color -->
+<!-- <meta name="theme-color" content="#1464FB"> -->
+<title>LOAM论文研读</title>
+<!-- 百度统计 -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<!-- 谷歌分析 -->
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<!-- Android Lolipop Theme Color -->
+<meta name="theme-color" content=" rgb(255,210,32) ">
+</head>
+<body>
+
+<!-- 顶部锚点 -->
+<a id="htmlup" name="htmlup"></a>
+<!-- 引入博文顶部选项 -->
+
+<header id="post-header" style="background-color:rgb(255,210,32);">
+  <div class="top-center">
+      <div class="logo">
+          <a href="/" title="my awesome webtitle" style="color: white;">James' HomePage</a>
+      </div>
+      <nav class="top-nav">
+          <ul>
+              
+                <li><a href="/" style="color: white;">首页</a></li>
+              
+                <li><a href="/tags.html" style="color: white;">标签</a></li>
+              
+                <li><a href="/timeline.html" style="color: white;">时间线</a></li>
+              
+                <li><a href="/about.html" style="color: white;">关于博主</a></li>
+              
+                <li><a href="/friendLink.html" style="color: white;">友情链接</a></li>
+              
+          </ul>
+      </nav>
+      <div id="top-boot">
+        <a href="javascript:;" id="boot1" style="display:block;" onclick="document.getElementById('boot-area').style.display='block';document.getElementById('boot1').style.display='none';document.getElementById('boot2').style.display='block';"><img src="/assets/boot_white.png" alt=""></a>
+        <a href="javascript:;" id="boot2" style="display: none;" onclick="document.getElementById('boot-area').style.display='none';document.getElementById('boot1').style.display='block';document.getElementById('boot2').style.display='none';"><img src="/assets/boot_white.png" alt=""></a>
+      </div>
+  </div>
+
+</header>
+
+
+<!-- 引入移动下拉选项 -->
+<div id="boot-area">
+    <ul>
+        
+          <a href="/"><li>首页</li></a>
+        
+          <a href="/tags.html"><li>标签</li></a>
+        
+          <a href="/timeline.html"><li>时间线</li></a>
+        
+          <a href="/about.html"><li>关于博主</li></a>
+        
+          <a href="/friendLink.html"><li>友情链接</li></a>
+        
+    </ul>
+</div>
+
+<!-- 引入博文顶部样式 -->
+<!-- 版本一 垃圾 -->
+<!-- <div class="wow fadeIn top" data-wow-duration="3.5s" >
+    <span class="wow fadeInUp" data-wow-delay="0.2s">LOAM论文研读</span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span>
+</div> -->
+
+<!-- 版本二 可切换页面 -->
+
+<div class="post-top" style="background-color:rgb(255,210,32);">
+  <!-- 页面宽度大于800px -->
+  <div class="left-area">
+    
+      <a href="javascript:;" class="btn bounceInLeft animated" onmouseover="showLeft();this.style.color='rgb(255,210,32)';" onmouseout="goneLeft();this.style.color='rgba(0,0,0,.2)';"><</a>
+      <div id="left-tab" style="display:none;"><span class="left-san"></span><span class="left-main" style="color:rgb(255,210,32);"><sapn class="main">没有上一页咯</sapn></span></div>
+    
+  </div>
+  <div class="post-titlearea">
+    <span class="wow fadeInUp" data-wow-delay="0.2s">LOAM论文研读</span>
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span> -->
+  </div>
+  <div class="right-area">
+    
+      <a href="/2019/07/25/test-jekyll.html" class="btn bounceInRight self-animated" onmouseover="showRight();this.style.color='rgb(255,210,32)';" onmouseout="goneRight();this.style.color='rgba(0,0,0,.2)';">></a>
+      <div id="right-tab" style="display:none;"><span class="right-san"></span><span class="right-main" style="color:rgb(255,210,32);"><sapn class="main">Test Jekyll</sapn></span></div>
+    
+  </div>
+
+  <!-- 页面宽度小于800px -->
+  <div class="post-changearea">
+    
+      <a href="javascript:;" class="leftchange" style="border-right: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span><br>没有上一篇咯</span></a>
+    
+    
+      <a href="/2019/07/25/test-jekyll.html" class="rightchange" style="border-left: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>下一篇<br><br>Test Jekyll</span></a>
+    
+  </div>
+</div>
+
+
+<div class="markdown-body fadeInUp animated">
+
+  
+
+  <!-- 文章内容 -->
+  <h1 id="loam论文研读">LOAM论文研读</h1>
+
+<p>​		下面让我们从3D激光SLAM的常用算法LOAM来入手，从提出这个算法的论文开始逐步剖析，了解3D激光SLAM面临的困难及解决方案。</p>
+<h2 id="摘要">摘要</h2>
+<p>​		首先在提出LOAM算法的论文（Low-drift and Real-time Lidar Odom and Mapping）中，作者提出了一种仅使用在六自由度环境下移动的3D激光雷达获取到的数据进行实时、低漂移的里程计和建图算法。实际上，这个问题并没有描述中的那么简单，由于激光雷达这个传感器结构的特殊性，其数据是在不同时刻采集到的，因此会导致点云数据的错误配准进而影响建图。为了解决这些问题，大多数3D激光SLAM算法都会进行回环检测来减少传感器带来的累计漂移，但是在LOAM中并没有回环检测这一手段，而是将SLAM问题拆分为两个子算法：里程计和建图。前者以较高的频率但是较低的精度实现对激光雷达的速度估计，而后者则以较前一个算法的频率低一个数量级的频率对激光雷达的数据进行匹配和点云的配准，通过这两个算法的结合就能实现实时建图的任务。算法的流程图如下所示：</p>
+
+<div align="center">
+  <img src="../25/算法流程图.png" width="75%" height="75%" />
+</div>
+
+<div align="center"> 图1  LOAM算法流程图 </div>
+
+<h2 id="符号说明">符号说明</h2>
+
+<p>​		接下来将会出现一系列的公式和符号，为了不产生混淆我们先在此进行介绍，之后的讲解中如有不理解的仍然会停下来进行说明，不过为了能够更快的继续我的们的课程，提前进行符号说明是必须的：</p>
+
+<blockquote>
+  <p>$P^{k}$：表示在第$k$次扫描时获取到的点云数据</p>
+
+  <p>$X_{k,i}^{L}$：表示在第$k$次扫描时，在激光雷达坐标系{$L$}下的一个点$i$</p>
+
+  <p>$X_{k,i}^{W}$：表示在第$k$次扫描时，在世界坐标系{$W$}下的一个点$i$</p>
+
+  <p>$T_{k}^{L}(t)$：表示在时刻$t$将一个点映射到第k次扫描起始时的坐标系下的变换（由于运动畸变）</p>
+
+  <p>$T_{k}^{W}(t)$：表示在时刻$t$将一个点映射到世界坐标系下的变换</p>
+</blockquote>
+
+<h2 id="激光里程计">激光里程计</h2>
+
+<h3 id="特征点选取">特征点选取</h3>
+
+<p>​		和许多SLAM算法一样，LOAM算法也使用特征点来计算坐标变换矩阵，因此我们的第一步便是从激光雷达获取到的点云中提取特征点，在LOAM中将特征点分为了两类：边缘点(Edge points)和平面点(Planar Points)。下面我们将会介绍如何在点云中提取这两类特征点。</p>
+
+<p>​		提取特征点的依据是这个点的曲率，选取在点云$P_{k}$中的点$i$，设集合$S$为与点$i$相邻的点的集合，那么点$i$处的曲率可以由下式得到：
+<script type="math/tex">c=\frac{1}{|S|\cdot||X_{(k,i)}^{L}||}||\sum_{j\in S,j\ne i}(X_{(k,i)}^{L}-X_{(k,j)}^{L})||</script>
+​		在实际应用中我们通常使用点$i$周围几个点来计算该点的曲率，得到了曲率后我们根据$c$值对各点进行排序，其中$c$值最大的被选为边缘点而最小的被选为平面点。在论文中，作者为了让特征点能够在全空间内分布的更加均匀，将每一次扫描分为四个子区域，每一个子区域最多可以提供2个边缘特征点和4个平面特征点，而且均需要和阈值$5\times10^{-3}$进行比较才能确定是否为特征点。</p>
+
+<p>​		除此之外，由于传感器的数据不可能是完全精确的而且现实的环境又是多种多样极其复杂的，在选取特征点的时候需要避开可能造成错误的特征点，在LOAM中就对特征点的选取给出了限制：</p>
+
+<blockquote>
+  <p>特征点的数量不应该超过子区域对特征点数量的限制</p>
+
+  <p>应避免在已经被选择的点周围再次选择特征点</p>
+
+  <p>特征点不应该选取在和雷达平面的夹角在$10^{\circ}$以内平面上</p>
+
+  <p>特征点不应该选取在被遮挡的平面上</p>
+</blockquote>
+
+<p>​		最主要的也最值得解释的是后两点限制，这两种情况的示意图如下图所示：</p>
+
+<div align="center">
+  <img src="../25/特征点选取示意图.png" width="75%" height="75%" />
+</div>
+
+<div align="center"> 图2 特征点选取示意图 </div>
+
+<p>​		在第一种情况下，需要通过$S$中的点构成的平面来计算和激光雷达平面的角度；而在第二种情况下，则需要对点$i$附近的点中是否存在与其相隔很远的点来进行检查，如果存在这样的点则说明点$i$是在被遮挡着的平面上（即上图中的C、D点），特征点提取的结果如图下所示，其中黄色的点表示边缘点而红色则表示平面点。</p>
+
+<div align="center">
+  <img src="../25/特征点选取示意图2.png" width="50%" height="50%" />
+</div>
+
+<div align="center"> 图3 特征点选取结果示意图 </div>
+
+<h3 id="特征点匹配">特征点匹配</h3>
+
+<p>​		里程计算法用于估计激光雷达在一次扫描中的运动，我们设$t_{k}$为第$k$次扫描的起始时间，在第$k-1$次扫描的最后时刻将这一次扫描中采集到的点云数据映射到时间戳$t_{k}$上，这些被映射过的点云被记为$\overline{P}<em>{k-1}$，在第$k$次扫描中这部分数据和在第$k$次扫描时逐渐采集到的点云数据$P</em>{k}$一起估计激光雷达的运动。</p>
+
+<p>​		在这一部分中我们不考虑如何对点云进行映射，我们将在下一部分介绍如何得到所需的变换阵。我们设在点云集合$P_{k}$中边缘特征点的集合为$\varepsilon_{k}$，平面特征点的集合为$\mathcal{H}<em>{k}$，我们接下来就需要在$\overline{P}</em>{k-1}$中寻找和这两个集合中元素匹配的点。需要注意的是在第$k$次扫描刚开始时，上述的集合都还是空集合，随着扫描时间的增加特征点的数量逐渐增加，因此我们需要将特征点映射到第$k$次扫描的起始时刻$t_{k}$，设映射后的点集为$\tilde\varepsilon_{k}$和$\tilde{\mathcal{H}}<em>{k}$。对于映射后的集合中的每一个元素，在$\overline{P}</em>{k-1}$中寻找最近邻的点，其中$\overline{P}_{k-1}$是通过$KD-tree$进行储存的。</p>
+
+<ul>
+  <li>
+    <p>首先介绍边缘特征点如何进行匹配。对于在集合$\tilde\varepsilon_{k}$中的边缘特征点$i$首先在$\overline{P}_{k-1}$中寻找它的最近邻点$j$，之后在这个近邻点$j$所在的扫描面的前后两个扫描面上寻找与$i$最近邻的点$l$。那么边缘特征点的匹配就可以使用元组$(j,l)$来进行表示，但是这两个点都需要满足$c&gt;5\times10^{-3}$的条件。</p>
+  </li>
+  <li>
+    <p>接下来介绍平面特征点如何进行匹配。对于在集合$\tilde{\mathcal{H}}<em>{k}$中的平面特征点$i$首先在$\overline{P}</em>{k-1}$中寻找它的最近邻点$j$，之后再寻找两个近邻点用来表示平面特征点的匹配，这两个点的其中一个是在这个近邻点$j$所在的扫描面选择的除点$j$之外的另一个近邻点，另一个是在其前后两个扫描面上选择的一个近邻点。那么平面特征点的匹配就可以使用元组$(j,l,m)$来进行表示。之所以这样选取是为了保证这三个一定是不共线的，当然和边缘特征点匹配中一样，同样需要保证这三个点满足$c&lt;5\times10^{-3}$的条件。特征点匹配的示意图如下所示：</p>
+  </li>
+</ul>
+
+<div align="center">
+  <img src="../25/特征点匹配示意图.png" width="75%" height="75%" />
+</div>
+
+<div align="center"> 图4 特征点匹配示意图 </div>
+
+<p>​		获得了匹配好的特征点后，我们可以通过特征点和与其匹配的边缘或平面之间的距离来对变换矩阵进行优化，具体的计算方式如下所示：</p>
+
+<ul>
+  <li>边缘特征点和对应边缘之间的距离可以通过外积来求得。下式中的分子部分表示的是由$\vec{ij}$和$\vec{il}$为边组成的平行四边形的面积，而分子则表示$\vec{jl}$的长度，最终的结果便是点$i$到点$j$和$l$表示的边缘的距离：</li>
+</ul>
+
+<script type="math/tex; mode=display">d\varepsilon=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\times(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,l)}^{L})|}{|\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L}|}</script>
+
+<ul>
+  <li>平面特征点和对应平面之间的距离可以通过混合积来求得。下式中的分子部分表示的是由$\vec{jm}$、$\vec{jl}$和$\vec{ji}$为边组成的平行六面体的体积，而分子则表示底面的面积，最终的结果便是点$i$到底面的距离：</li>
+</ul>
+
+<script type="math/tex; mode=display">d_{\mathcal{H}}=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\cdot((\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L}))|}{|(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L})|}</script>
+
+<p>​		注意其中$X$上边符号的不同，$\tilde{}$表示的是在$\tilde{P_{k}}$中获得到的特征点，而$\bar{}$则表示的是在$\bar{P}_{k-1}$中获得到的前一次扫描中的特征点。</p>
+
+<h3 id="动作估计">动作估计</h3>
+
+<p>​		在这一部分中我们就开始介绍之前没有进行的动作估计，也就是获得在第$k$次扫描时的变换矩阵，这个变换矩阵是一个随时间发生变化的矩阵$T_{k}^{L}(t)$。这个变换矩阵表征了六个自由度上的变化，可以被拆分成两个部分，分别是旋转变换和平移变换：$T_{k}^{L}(t)=[\tau_{k}^{L}(t),\theta_{k}^{L}(t)]^{T}$，其中$\tau_{k}^{L}(t)=[t_x,t_y,t_z]^T$，$\theta_{k}^{L}(t)=[\theta_x,\theta_y,\theta_z]^T$。可以使用罗德里格斯公式来计算对应的旋转矩阵：
+<script type="math/tex">R_{k}^{L}(t)=e^{\hat{\theta}_{k}^{L}(t)}=I+\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||}sin||\theta_{k}^{L}(t)||+(\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||})^2(1-||cos\theta_{k}^{L}(t)||)</script>
+​		其中$\hat{\theta}<em>{k}^{L}(t)$表示$\theta</em>{k}^{L}(t)$的反对称矩阵，如果不清楚可以稍后随意查一下就行，或者只需要知道这是一个由$\theta_{k}^{L}(t)$中的元素组成的矩阵即可。得到了旋转矩阵后便可以使用获取到的点云数据将其映射回当前扫描的起始时刻$t_k$：
+<script type="math/tex">\tilde{X}_{(k,i)}^{L}=R_{(k,i)}^{L}X_{(k,i)}^{L}+\tau_{(k,i)}^{L}</script>
+​		不知道大家还记不记得之前计算特征点和边缘与平面之间距离的公式，将上式与那两个公式联系起来便能简化成以下形式：</p>
+
+<ul>
+  <li>$f_{\varepsilon}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d\varepsilon,　i\in\varepsilon_{k}$</li>
+  <li>$f_{\mathcal{H}}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d_{\mathcal{H}},　i\in\mathcal{H}_{k}$</li>
+</ul>
+
+<p>​		将上式进行统一即可得到以下的公式，我们可以使用列文伯格-马夸尔特优化算法不断地进行优化直至收敛或达到预设的迭代次数，进而得到期望的变换矩阵$T_{k}^{L}(t)$：
+<script type="math/tex">f(T_{k}^{L}(t))=d</script></p>
+
+<script type="math/tex; mode=display">T_k^L(t)\leftarrow T_k^L(t)-(J^TJ+\lambda diag(J^TJ))^{-1}J^Td</script>
+
+<p>​		其中$J$为$f$对$T_k^L(t)$计算得到的$Jacobian$矩阵，$\lambda$是由列文伯格-马夸尔特算法决定的因子。</p>
+
+<h3 id="激光里程计的整体算法">激光里程计的整体算法</h3>
+
+<p>​		下面是我们刚才叙述的激光里程计算法的汇总，可以看到在第$k$次扫描时的输入为上一次扫描获得的点云映射在$t_k$时刻之后的结果，当前扫描获取到的点云信息和初始变换矩阵。按照刚刚讲解的顺序，先是从点云数据中提取了边缘特征点和平面特征点，之后又使用非线性优化方法对变换矩阵进行计算，当结束本次扫描后再将本次扫描获取到的点云数据使用上一步中计算得到的变换矩阵将点云数据映射到$t_{k+1}$时刻上，最后结束本次扫描并返回变换矩阵。</p>
+
+<div align="center">
+  <img src="../25/激光里程计算法.png" width="65%" height="65%" />
+</div>
+
+<div align="center"> 图5 激光里程计算法 </div>
+
+<h2 id="激光建图">激光建图</h2>
+
+<p>​		激光建图的整个流程和激光里程计实质上并没有什么差别，只不过我们需要进行匹配的点云是地图点云$Q_{k-1}$而已。在下图中黑色部分的是已经建好的地图中的点云，绿色部分是我们在第$k$次扫描时获取到的点云数据映射到世界坐标系${W}$下的结果，蓝色的轨迹线是在第$k$次扫描以前激光雷达的运动轨迹，而橙色的轨迹线则表示在第$k$次扫描时激光雷达运动的轨迹。</p>
+
+<div align="center">
+  <img src="../25/建图示意图.png" width="65%" height="65%" />
+</div>
+
+<div align="center"> 图6 建图示意图 </div>
+
+<p>​		在建图中，由于采用更低的频率，我们也可以选择更多的特征点数，在论文中作者选择了十倍于里程计算法的特征点数，但是选择特征点的方式和依据没有改变。在建图中我们需要通过优化算法计算的主要是将激光雷达位姿映射到世界坐标系的变换$T_k^W(t)$，将之前用于优化的公式中的所有$T_k^L(t)$替换为$T_k^W(t)$并把在$P_k$中出现的点替换为在$Q_{k}$中出现的点即可：</p>
+
+<ul>
+  <li>$f_{\varepsilon}(Q_{(k,i)}(t),T_{k}^{W}(t))=d\varepsilon,　i\in\varepsilon_{k}$</li>
+  <li>$f_{\mathcal{H}}(Q_{(k,i)}(t),T_{k}^{L}(t))=d_{\mathcal{H}},　i\in\mathcal{H}_{k}$</li>
+</ul>
+
+<p>​		之后仍然是使用列文伯格-马夸尔特算法进行优化实现建图操作，至此我们的论文解析就结束了，在LOAM中仅使用了激光雷达的点云数据，通过两个子算法激光里程计和激光建图实现了低漂移的3D激光SLAM。</p>
+
+
+  <!-- 引入share模块 -->
+  
+  <div class="social-share-wrapper">
+    <div class="social-share"></div>
+  </div>
+
+
+<!-- share.js -->
+<script src="/assets/js/social-share.min.js"></script>
+<script>
+  socialShare('.social-share', {
+    sites: [
+      
+        'qq'
+        ,
+        
+      
+        'wechat'
+        ,
+        
+      
+        'weibo'
+        ,
+        
+      
+        'twitter'
+        ,
+        
+      
+        'facebook'
+        
+      
+    ],
+    wechatQrcodeTitle: "分享到微信朋友圈",
+    wechatQrcodeHelper: '期待在朋友圈见到这篇文章'
+  });
+</script>
+
+</div>
+
+<!-- 底部锚点 -->
+<a id="htmldown" name="htmldown"></a>
+<!-- 引入评论模块 -->
+
+
+
+    <section class="post-footer-item comment">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDI2OS8xMDgwNg=="></div>
+    </section>
+
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+
+           if (typeof LivereTower === 'function') { return; }
+
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+    </script>
+    <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    <!-- City版安装代码已完成 -->
+
+
+
+
+
+<!-- 引入goto模块 -->
+<div class="bounceInRight animated go">
+  <a title="顶部切换页面" class="gototop" href="#htmlup" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Top
+    </div>
+  </a>
+  <a title="底部有livere评论哦" class="gotobottom" href="#htmldown" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Foot
+    </div>
+  </a>
+</div>
+
+<!-- 引入页面底部模块 -->
+<footer id="bottom">
+  <br>
+  <span>James' HomePage ©
+  
+  
+    2018
+    -
+  
+  2019
+  <br>
+  Powered by <a href="https://www.jekyll.com.cn/">Jekyll</a> | <a href="https://github.com/xukimseven/HardCandy-Jekyll">HardCandy-Jekyll</a></span>
+</footer>
+
+
+<!-- 引用wow.js的动画效果 -->
+<script src="/assets/js/wow.js"></script>
+<script>
+    var wow = new WOW({
+        boxClass: 'wow',
+        animateClass: 'animated',
+        // offset: 600,
+        mobile: true,
+        live: true
+    });
+    wow.init();
+</script>
+<!-- 页面刷新回到顶部 -->
+<script>
+    window.onbeforeunload = function(){
+        //刷新后页面自动回到顶部
+        document.documentElement.scrollTop = 0;  //ie下
+        document.body.scrollTop = 0;  //非ie
+    }
+</script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

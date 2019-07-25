@@ -1,8 +1,8 @@
 # Site settings 配置站点
-title: 'your awesome title'
-description: 'your web description'
-keywords: 'your web keywords, another keywords'
-url: 'https://abc.github.io' # your host
+title: "James' HomePage"
+description: '这是一个初学博客的博主'
+keywords: 'Robot, Artificial Intelligent, Diary'
+url: 'https://james0618.github.io' # your host
 
 # nav 中文字符空格：&emsp;
 nav: # 最佳体验 六个标签 且最好每个标签不超过4中文字
@@ -14,34 +14,26 @@ nav: # 最佳体验 六个标签 且最好每个标签不超过4中文字
 
 # 博主
 author: true
-name: 'your awesome name'
-NickName: 'your awesome nickname'
-webtitle: 'your awesome webtitle'
-bio: 'your awesome bio'
+name: '柴嘉骏'
+NickName: '小柴'
+webtitle: "James' HomePage"
+bio: "Student of Xi'an JiaoTong University"
 about: true
-aboutyou: 'your introduction'
+aboutyou: '西安交通大学在读学生，专业为自动化（钱学森班），计划在自己的主页上更新所学知识和一直以来情感上的困惑，啊总之就是想到什么更什么就好了，最主要的还是一个树洞吧，自我反思自我成长。'
 portraits: '/assets/profile.jpeg' # your portraits image file path
 
 # SNS
 SNS: true
 SNS-icon: #['Facebook', 'weibo', 'qq', 'github', 'Dribbble', 'Twitter', 'instagram', 'weixin', 'Codepen']
-  mail: 'mailto:abc@gmail.com'
-  weixin: '' # 你的微信二维码存放的地址
-  qq: '' # 你的qq二维码存放的地址 or http://wpa.qq.com/msgrd?v=3&uin='你的QQ号'&site=qq&menu=yes
-  github: ''
-  Codepen: ''
-  weibo: ''
-  instagram: ''
-  Twitter: ''
-  Dribbble: ''
-  Facebook: ''
-  Google: ''
-  zhihu: ''
-  juejin: ''
-  twitch: ''
+  mail: 'mailto:cjj0618@stu.xjtu.edu.com'
+  weixin: 'images/qrcode_wechat.png' # 你的微信二维码存放的地址
+  qq: 'images/qrcode_qq.png' # 你的qq二维码存放的地址 or http://wpa.qq.com/msgrd?v=3&uin='你的QQ号'&site=qq&menu=yes
+  github: 'https://github.com/James0618'
+  weibo: 'https://weibo.com/6048616777'
+  zhihu: 'https://www.zhihu.com/people/chai-jia-jun-70'
 
 # 分页
-paginate: 2
+paginate: 3
 paginatepath: ['page:num']
 
 # since
@@ -59,7 +51,7 @@ pygmentsTheme: 'default'
 
 # 友情链接
 friends:
-  jekyll: 'https://www.jekyll.com.cn/'
+  School: 'http://www.xjtu.edu.cn/'
 
 # 评论 最佳体验 在disqus、livere和Gitment之间三选一
 # disqus 评论
@@ -70,8 +62,8 @@ livere: true
 livere_uid: 'MTAyMC8zNDI2OS8xMDgwNg==' # MTAyMC8zNDI2OS8xMDgwNg==
 # Gitment评论 OAuth Application
 Gitment: false
-Gitment_owner: ''  # github用户名
-Gitment_repo: ''  # github博客存放的仓库名
+Gitment_owner: 'James0618'  # github用户名
+Gitment_repo: 'https://github.com/James0618/James0618.github.io'  # github博客存放的仓库名
 client_id: ''  # 注册 OAuth Application 后获得的 client_id
 client_secret: ''  # 注册 OAuth Application 后获得的 client_secret
 
