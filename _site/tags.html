@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="/assets/css/share.min.css">
 <!-- font -->
 <link rel="stylesheet" href="/assets/css/font.css">
+<link rel="dns-prefetch" href="//cdn.bootcss.com" />
 <!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
 
 <!-- Favicon -->
@@ -41,15 +42,25 @@ var _hmt = _hmt || [];
 
 <!-- 谷歌分析 -->
 
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
+var mathId = document.getElementById("post-content"); //选择公式识别范围
+MathJax.Hub.Config({
+    showProcessingMessages: false, //关闭js加载过程信息
+    messageStyle: "none", //不显示信息
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
     tex2jax: {
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-      inlineMath: [['$','$']]
+        inlineMath:  [ ["$", "$"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"] ], //段内公式选择$$
+    },
+    "HTML-CSS": {
+        availableFonts: ["STIX","TeX"], //可选字体
+        showMathMenu: true //关闭右击菜单显示
     }
-  });
+});
+MathJax.Hub.Queue(["Typeset",MathJax.Hub,mathId]);
 </script>
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 </head>
 <body>
