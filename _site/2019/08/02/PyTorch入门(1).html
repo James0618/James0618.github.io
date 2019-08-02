@@ -1,0 +1,369 @@
+<!-- 博文的布局-Layout -->
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 引入head标签 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-sclable=0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="这是一个初学博客的博主" />
+<meta name="keywords" content="Robot, Artificial Intelligent, Diary" />
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/media.css">
+<link rel="stylesheet" href="/assets/css/animate.min.css">
+<link rel="stylesheet" href="/assets/css/pygments/pygments_default.css">
+<link rel="stylesheet" href="/assets/css/github-markdown.css">
+<!-- SNS-icon -->
+<script src="//at.alicdn.com/t/font_856428_y9z6nq7zf5.js"></script>
+<!-- share.css -->
+<link rel="stylesheet" href="/assets/css/share.min.css">
+<!-- font -->
+<link rel="stylesheet" href="/assets/css/font.css">
+<link rel="dns-prefetch" href="//cdn.bootcss.com" />
+<!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
+
+<!-- Favicon -->
+<link href="/assets/profile.jpeg" rel="shortcut icon" />
+<link href="/assets/profile.jpeg" rel="apple-touch-icon-precomposed" />
+<!-- Android Lolipop Theme Color -->
+<!-- <meta name="theme-color" content="#1464FB"> -->
+<title>PyTorch 入门(1)</title>
+<!-- 百度统计 -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<!-- 谷歌分析 -->
+
+<script type="text/x-mathjax-config">
+var mathId = document.getElementById("post-content"); //选择公式识别范围
+MathJax.Hub.Config({
+    showProcessingMessages: false, //关闭js加载过程信息
+    messageStyle: "none", //不显示信息
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath:  [ ["$", "$"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"] ], //段内公式选择$$
+    },
+    "HTML-CSS": {
+        availableFonts: ["STIX","TeX"], //可选字体
+        showMathMenu: true //关闭右击菜单显示
+    }
+});
+MathJax.Hub.Queue(["Typeset",MathJax.Hub,mathId]);
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<!-- Android Lolipop Theme Color -->
+<meta name="theme-color" content=" rgb(255,210,32) ">
+</head>
+<body>
+
+<!-- 顶部锚点 -->
+<a id="htmlup" name="htmlup"></a>
+<!-- 引入博文顶部选项 -->
+
+<header id="post-header" style="background-color:rgb(255,210,32);">
+  <div class="top-center">
+      <div class="logo">
+          <a href="/" title="my awesome webtitle" style="color: white;">James' HomePage</a>
+      </div>
+      <nav class="top-nav">
+          <ul>
+              
+                <li><a href="/" style="color: white;">首页</a></li>
+              
+                <li><a href="/tags.html" style="color: white;">标签</a></li>
+              
+                <li><a href="/timeline.html" style="color: white;">时间线</a></li>
+              
+                <li><a href="/about.html" style="color: white;">关于博主</a></li>
+              
+                <li><a href="/friendLink.html" style="color: white;">友情链接</a></li>
+              
+          </ul>
+      </nav>
+      <div id="top-boot">
+        <a href="javascript:;" id="boot1" style="display:block;" onclick="document.getElementById('boot-area').style.display='block';document.getElementById('boot1').style.display='none';document.getElementById('boot2').style.display='block';"><img src="/assets/boot_white.png" alt=""></a>
+        <a href="javascript:;" id="boot2" style="display: none;" onclick="document.getElementById('boot-area').style.display='none';document.getElementById('boot1').style.display='block';document.getElementById('boot2').style.display='none';"><img src="/assets/boot_white.png" alt=""></a>
+      </div>
+  </div>
+
+</header>
+
+
+<!-- 引入移动下拉选项 -->
+<div id="boot-area">
+    <ul>
+        
+          <a href="/"><li>首页</li></a>
+        
+          <a href="/tags.html"><li>标签</li></a>
+        
+          <a href="/timeline.html"><li>时间线</li></a>
+        
+          <a href="/about.html"><li>关于博主</li></a>
+        
+          <a href="/friendLink.html"><li>友情链接</li></a>
+        
+    </ul>
+</div>
+
+<!-- 引入博文顶部样式 -->
+<!-- 版本一 垃圾 -->
+<!-- <div class="wow fadeIn top" data-wow-duration="3.5s" >
+    <span class="wow fadeInUp" data-wow-delay="0.2s">PyTorch 入门(1)</span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span>
+</div> -->
+
+<!-- 版本二 可切换页面 -->
+
+<div class="post-top" style="background-color:rgb(255,210,32);">
+  <!-- 页面宽度大于800px -->
+  <div class="left-area">
+    
+      <a href="javascript:;" class="btn bounceInLeft animated" onmouseover="showLeft();this.style.color='rgb(255,210,32)';" onmouseout="goneLeft();this.style.color='rgba(0,0,0,.2)';"><</a>
+      <div id="left-tab" style="display:none;"><span class="left-san"></span><span class="left-main" style="color:rgb(255,210,32);"><sapn class="main">没有上一页咯</sapn></span></div>
+    
+  </div>
+  <div class="post-titlearea">
+    <span class="wow fadeInUp" data-wow-delay="0.2s">PyTorch 入门(1)</span>
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span> -->
+  </div>
+  <div class="right-area">
+    
+      <a href="/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html" class="btn bounceInRight self-animated" onmouseover="showRight();this.style.color='rgb(255,210,32)';" onmouseout="goneRight();this.style.color='rgba(0,0,0,.2)';">></a>
+      <div id="right-tab" style="display:none;"><span class="right-san"></span><span class="right-main" style="color:rgb(255,210,32);"><sapn class="main">LOAM论文研读</sapn></span></div>
+    
+  </div>
+
+  <!-- 页面宽度小于800px -->
+  <div class="post-changearea">
+    
+      <a href="javascript:;" class="leftchange" style="border-right: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span><br>没有上一篇咯</span></a>
+    
+    
+      <a href="/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html" class="rightchange" style="border-left: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>下一篇<br><br>LOAM论文研读</span></a>
+    
+  </div>
+</div>
+
+
+<div class="markdown-body fadeInUp animated">
+
+  
+
+  <!-- 文章内容 -->
+  <h1 id="pytorch">PyTorch</h1>
+
+<h2 id="pytorch-中的求导">Pytorch 中的求导</h2>
+
+<p>​		在Pytorch中的<code class="highlighter-rouge">backward()</code>是用于计算图的求导的，首先变量有一个requires_grad参数，如果设置为$True$则需要进行求导，在求导过程中：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">out</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>​		是对其最后方设置了<code class="highlighter-rouge">requires_grad=True</code>的变量进行求导，例如下面这段程序，我们将从它及其它的变体来理解<code class="highlighter-rouge">backward()</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+
+
+<span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+
+<span class="n">v_1</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">variable</span>
+<span class="n">v_2</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">v_1</span>
+
+<span class="n">v_2</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"variable.grad: </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​		上面这段程序是很好理解的，由于variable是最后方设置了<code class="highlighter-rouge">requires_grad=True</code>的参数，因此在执行<code class="highlighter-rouge">v_2.backward()</code>的时候就相当于对<code class="highlighter-rouge">variable</code>求导，最终的结果如下所示：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variable.grad: 
+ tensor([12.])
+</code></pre></div></div>
+
+<p>​		结果自然就是$3\times 4=12$了，但需要说明的是<code class="highlighter-rouge">backward()</code>方法不支持对非标量进行求导，因此提供了一个$gradient$参数用骚操作实现对非标量求导。在执行<code class="highlighter-rouge">out.backward(gradient)</code>的时候，如果out不是一个标量，那么先构造一个标量的值：<code class="highlighter-rouge">L = torch.sum(z*gradient)</code>，再计算关于L对各个叶子变量的梯度。因此<code class="highlighter-rouge">backward()</code>在没有任何参数时相当于执行了<code class="highlighter-rouge">out.backward(gradient=torch.FloatTensor([1]))</code>，也就是在结果上乘了一个1再求导，这也解释了为什么在<code class="highlighter-rouge">gradient=torch.FloatTensor([2])</code>的时候结果会乘2。</p>
+
+<p>​		最后说明一下，<code class="highlighter-rouge">backward()</code>的求导是真真切切的对变量求导，变量的平方的求导和变量的拷贝乘平方的结果是不一样的！</p>
+
+<h2 id="建立神经网络">建立神经网络</h2>
+
+<ul>
+  <li><code class="highlighter-rouge">unsqueeze(torch.linspace(-1, 1, 100), dim=1)</code>：由于torch只能处理二维的数据，因此需要用这个操作增加一个维度（从0开始），比如这个语句就实现了从<code class="highlighter-rouge">torch.Size([100])</code>到<code class="highlighter-rouge">torch.Size([100, 1])</code>的转换。</li>
+  <li><code class="highlighter-rouge">class Net(torch.nn.Module):</code>：在定义网络的时候需要继承torch中神经网络的模型<code class="highlighter-rouge">torch.nn.Module</code>。</li>
+  <li><code class="highlighter-rouge">forward()</code>：每一个网络中都会有这个方法</li>
+</ul>
+
+<p>​    在此叙述一下使用torch搭建网络所需要环节和步骤。首先是一个描述网络的类，其元素和方式在上面已经列出，其中在初始化函数使用<code class="highlighter-rouge">torch.nn</code>的各种层来对网络进行描述，在<code class="highlighter-rouge">forward()</code>中对网络的结构进行描述：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feature</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_feature</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">hidden_out</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">hidden_out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></div>
+
+<p>​		在完成了对网络的描述后需要进行训练或者说学习，在学习时需要构建损失函数和优化器，在构建优化器的时候需要将网络的参数传进去并设置学习率：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">loss_func</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>​		至于训练，则需要使用网络计算对应x的输出<code class="highlighter-rouge">prediction</code>，之后使用预设的损失函数计算<code class="highlighter-rouge">loss</code>，接下来首先将优化器的梯度置为0，这是因为每次优化结束梯度仍然会保持上一次的结果，然后对loss这个Variable变量进行<code class="highlighter-rouge">backward()</code>操作，最后执行优化器的梯度下降操作：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>​		<code class="highlighter-rouge">optimizer.zero_grad()</code>这一步至关重要！一定不要忘记！</p>
+
+
+  <!-- 引入share模块 -->
+  
+  <div class="social-share-wrapper">
+    <div class="social-share"></div>
+  </div>
+
+
+<!-- share.js -->
+<script src="/assets/js/social-share.min.js"></script>
+<script>
+  socialShare('.social-share', {
+    sites: [
+      
+        'qq'
+        ,
+        
+      
+        'wechat'
+        ,
+        
+      
+        'weibo'
+        ,
+        
+      
+        'twitter'
+        ,
+        
+      
+        'facebook'
+        
+      
+    ],
+    wechatQrcodeTitle: "分享到微信朋友圈",
+    wechatQrcodeHelper: '期待在朋友圈见到这篇文章'
+  });
+</script>
+
+</div>
+
+<!-- 底部锚点 -->
+<a id="htmldown" name="htmldown"></a>
+<!-- 引入评论模块 -->
+
+
+
+    <section class="post-footer-item comment">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDI2OS8xMDgwNg=="></div>
+    </section>
+
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+
+           if (typeof LivereTower === 'function') { return; }
+
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+    </script>
+    <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    <!-- City版安装代码已完成 -->
+
+
+
+
+
+<!-- 引入goto模块 -->
+<div class="bounceInRight animated go">
+  <a title="顶部切换页面" class="gototop" href="#htmlup" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Top
+    </div>
+  </a>
+  <a title="底部有livere评论哦" class="gotobottom" href="#htmldown" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Foot
+    </div>
+  </a>
+</div>
+
+<!-- 引入页面底部模块 -->
+<footer id="bottom">
+  <br>
+  <span>James' HomePage ©
+  
+  
+    2018
+    -
+  
+  2019
+  <br>
+  Powered by <a href="https://www.jekyll.com.cn/">Jekyll</a> | <a href="https://github.com/xukimseven/HardCandy-Jekyll">HardCandy-Jekyll</a></span>
+</footer>
+
+
+<!-- 引用wow.js的动画效果 -->
+<script src="/assets/js/wow.js"></script>
+<script>
+    var wow = new WOW({
+        boxClass: 'wow',
+        animateClass: 'animated',
+        // offset: 600,
+        mobile: true,
+        live: true
+    });
+    wow.init();
+</script>
+<!-- 页面刷新回到顶部 -->
+<script>
+    window.onbeforeunload = function(){
+        //刷新后页面自动回到顶部
+        document.documentElement.scrollTop = 0;  //ie下
+        document.body.scrollTop = 0;  //非ie
+    }
+</script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
