@@ -19,7 +19,7 @@ NickName: '小柴'
 webtitle: "James' HomePage"
 bio: "Student of Xi'an JiaoTong University"
 about: true
-aboutyou: '西安交通大学在读学生，专业为自动化（钱学森班），计划在自己的主页上更新所学知识和一直以来情感上的困惑，啊总之就是想到什么更什么就好了，最主要的还是一个树洞吧，自我反思自我成长。'
+aboutyou: '西安交通大学在读学生，专业为自动化（钱学森班），计划在自己的主页上更新所学知识，总之就是想到什么更什么就好了，最主要的还是一个树洞吧，自我反思自我成长。'
 portraits: '/assets/profile.jpeg' # your portraits image file path
 
 # SNS
