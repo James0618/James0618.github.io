@@ -1,0 +1,413 @@
+<!-- 博文的布局-Layout -->
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 引入head标签 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-sclable=0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="这是一个初学博客的博主" />
+<meta name="keywords" content="Robot, Artificial Intelligent, Diary" />
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/media.css">
+<link rel="stylesheet" href="/assets/css/animate.min.css">
+<link rel="stylesheet" href="/assets/css/pygments/pygments_default.css">
+<link rel="stylesheet" href="/assets/css/github-markdown.css">
+<!-- SNS-icon -->
+<script src="//at.alicdn.com/t/font_856428_y9z6nq7zf5.js"></script>
+<!-- share.css -->
+<link rel="stylesheet" href="/assets/css/share.min.css">
+<!-- font -->
+<link rel="stylesheet" href="/assets/css/font.css">
+<link rel="dns-prefetch" href="//cdn.bootcss.com" />
+<!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
+
+<!-- Favicon -->
+<link href="/assets/profile.jpeg" rel="shortcut icon" />
+<link href="/assets/profile.jpeg" rel="apple-touch-icon-precomposed" />
+<!-- Android Lolipop Theme Color -->
+<!-- <meta name="theme-color" content="#1464FB"> -->
+<title>ROS 内参标定</title>
+<!-- 百度统计 -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<!-- 谷歌分析 -->
+
+<script type="text/x-mathjax-config">
+var mathId = document.getElementById("post-content"); //选择公式识别范围
+MathJax.Hub.Config({
+    showProcessingMessages: false, //关闭js加载过程信息
+    messageStyle: "none", //不显示信息
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath:  [ ["$", "$"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"] ], //段内公式选择$$
+    },
+    "HTML-CSS": {
+        availableFonts: ["STIX","TeX"], //可选字体
+        showMathMenu: true //关闭右击菜单显示
+    }
+});
+MathJax.Hub.Queue(["Typeset",MathJax.Hub,mathId]);
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<!-- Android Lolipop Theme Color -->
+<meta name="theme-color" content=" rgb(255,210,32) ">
+</head>
+<body>
+
+<!-- 顶部锚点 -->
+<a id="htmlup" name="htmlup"></a>
+<!-- 引入博文顶部选项 -->
+
+<header id="post-header" style="background-color:rgb(255,210,32);">
+  <div class="top-center">
+      <div class="logo">
+          <a href="/" title="my awesome webtitle" style="color: white;">James' HomePage</a>
+      </div>
+      <nav class="top-nav">
+          <ul>
+              
+                <li><a href="/" style="color: white;">首页</a></li>
+              
+                <li><a href="/tags.html" style="color: white;">标签</a></li>
+              
+                <li><a href="/timeline.html" style="color: white;">时间线</a></li>
+              
+                <li><a href="/about.html" style="color: white;">关于博主</a></li>
+              
+                <li><a href="/friendLink.html" style="color: white;">友情链接</a></li>
+              
+          </ul>
+      </nav>
+      <div id="top-boot">
+        <a href="javascript:;" id="boot1" style="display:block;" onclick="document.getElementById('boot-area').style.display='block';document.getElementById('boot1').style.display='none';document.getElementById('boot2').style.display='block';"><img src="/assets/boot_white.png" alt=""></a>
+        <a href="javascript:;" id="boot2" style="display: none;" onclick="document.getElementById('boot-area').style.display='none';document.getElementById('boot1').style.display='block';document.getElementById('boot2').style.display='none';"><img src="/assets/boot_white.png" alt=""></a>
+      </div>
+  </div>
+
+</header>
+
+
+<!-- 引入移动下拉选项 -->
+<div id="boot-area">
+    <ul>
+        
+          <a href="/"><li>首页</li></a>
+        
+          <a href="/tags.html"><li>标签</li></a>
+        
+          <a href="/timeline.html"><li>时间线</li></a>
+        
+          <a href="/about.html"><li>关于博主</li></a>
+        
+          <a href="/friendLink.html"><li>友情链接</li></a>
+        
+    </ul>
+</div>
+
+<!-- 引入博文顶部样式 -->
+<!-- 版本一 垃圾 -->
+<!-- <div class="wow fadeIn top" data-wow-duration="3.5s" >
+    <span class="wow fadeInUp" data-wow-delay="0.2s">ROS 内参标定</span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span>
+</div> -->
+
+<!-- 版本二 可切换页面 -->
+
+<div class="post-top" style="background-color:rgb(255,210,32);">
+  <!-- 页面宽度大于800px -->
+  <div class="left-area">
+    
+      <a href="/2019/08/09/%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html" class="btn bounceInLeft animated" onmouseover="showLeft();this.style.color='rgb(255,210,32)';" onmouseout="goneLeft();this.style.color='rgba(0,0,0,.2)';"><</a>
+      <div id="left-tab" style="display:none;"><span class="left-san"></span><span class="left-main" style="color:rgb(255,210,32);"><sapn class="main">内参标定理论介绍</sapn></span></div>
+    
+  </div>
+  <div class="post-titlearea">
+    <span class="wow fadeInUp" data-wow-delay="0.2s">ROS 内参标定</span>
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span> -->
+  </div>
+  <div class="right-area">
+    
+      <a href="/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html" class="btn bounceInRight self-animated" onmouseover="showRight();this.style.color='rgb(255,210,32)';" onmouseout="goneRight();this.style.color='rgba(0,0,0,.2)';">></a>
+      <div id="right-tab" style="display:none;"><span class="right-san"></span><span class="right-main" style="color:rgb(255,210,32);"><sapn class="main">PyTorch 入门(2)</sapn></span></div>
+    
+  </div>
+
+  <!-- 页面宽度小于800px -->
+  <div class="post-changearea">
+    
+      <a href="/2019/08/09/%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html" class="leftchange" style="border-right: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>上一篇<br><br>内参标定理论介绍</span></a>
+    
+    
+      <a href="/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html" class="rightchange" style="border-left: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>下一篇<br><br>PyTorch 入门(2)</span></a>
+    
+  </div>
+</div>
+
+
+<div class="markdown-body fadeInUp animated">
+
+  
+
+  <!-- 文章内容 -->
+  <h1 id="ros-内参标定">ROS 内参标定</h1>
+
+<p>​		  在这一小节中我们将会介绍如何使用Intel的Realsense D415相机的RGB部分进行内参的标定，除此之外也会使用笔记本电脑自带的摄像头进行标定以让每一位同学都能有机会进行操作。在给Realsense相机进行标定之前我们需要：</p>
+
+<ul>
+  <li>安装最新的Intel® RealSense™ SDK 2.0</li>
+  <li>安装Realsense与ROS通信的Package：realsense-ros</li>
+  <li>安装用于相机标定的Package：camera_calibration</li>
+</ul>
+
+<h2 id="安装依赖package">安装依赖Package</h2>
+
+<p>​		  首先是安装最新的Intel® RealSense™ SDK 2.0，可以按照官方repo的<a href="https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages">文档</a>进行安装。首先添加注册服务器的public key，之后检查代理配置，接下来就是将服务器加入到仓库列表中安装需要的四个package即可：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE
+export http_proxy="http://&lt;proxy&gt;:&lt;port&gt;"
+
+sudo add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u
+sudo apt-get install librealsense2-dkms
+sudo apt-get install librealsense2-utils
+sudo apt-get install librealsense2-dev
+sudo apt-get install librealsense2-dbg
+</code></pre></div></div>
+
+<p>​		  如果需要更新一个功能包可以使用这两句命令：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get update
+sudo apt-get upgrade
+</code></pre></div></div>
+
+<p>​		  接下来是安装Realsense与ROS通信的Package：realsense-ros。首先是进入到我们ROS的工作空间中将Package的代码下载下来并切换到对应的分支，之后就是编译和进行安装：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/catkin_ws/src
+git clone https://github.com/IntelRealSense/realsense-ros.git
+cd realsense-ros/
+git checkout `git tag | sort -V | grep -P "^\d+\.\d+\.\d+" | tail -1`
+cd ..
+catkin_make clean
+catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
+catkin_make install
+</code></pre></div></div>
+
+<p>​		  在安装之前需要确保依赖项已经安装过，在这一节课我们假设你已经学习过前面的课程并安装了必要的功能包。如果在编译过程中出错可以直接尝试使用下面这行命令获取缺失的功能包：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install ros-kinetic-缺失的功能包
+</code></pre></div></div>
+
+<p>​		  在编译好之后将Realsense相机通过USB线连接到电脑上后，可以使用这行命令检查是否安装成功并驱动相机：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch realsense2_camera rs_camera.launch
+</code></pre></div></div>
+
+<p>​		  出现了下面的结果就说明安装成功了：</p>
+
+<div align="center">
+  <img src="../09/相机驱动成功.png" width="75%" height="75%" />
+</div>
+
+<p>​		  可用<code class="highlighter-rouge">rosrun rqt_image_view rqt_image_view</code>选择<code class="highlighter-rouge">/camera/color/image_raw</code>查看相机收到的图像信息。需要说明的是，相机获取图像信息是有一个帧率的，如果你的计算机无法处理高帧率的图像可以在launch文件中修改<code class="highlighter-rouge">color_fps</code>和<code class="highlighter-rouge">depth_fps</code>等参数以防止出现溢出现象。</p>
+
+<div align="center">
+  <img src="../09/相机图像.png" width="75%" height="75%" />
+</div>
+
+<p>​		  最后一部分就是安装用于相机标定的Package：camera_calibration。这个Package的安装可以参考<a href="http://wiki.ros.org/camera_calibration">ROS Wiki</a>的内容，首先将放在Github托管的程序下载在你的ROS工作空间里，</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/catkin_ws/src
+git clone -b kinetic https://github.com/ros-perception/image_pipeline
+cd ../
+catkin_make
+</code></pre></div></div>
+
+<p>​		  或者也可以简单粗暴的使用apt-get进行安装：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install ros-kinetic-camera-calibration
+</code></pre></div></div>
+
+<h2 id="realsense相机标定">Realsense相机标定</h2>
+
+<p>​		  之后可以选择自己打印或者购买相机标定需要的标定板，本节课中我们使用的标定板型号为<code class="highlighter-rouge">GP150-12*9</code>，有了标定板之后就可以开始进行相机标定了：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch realsense2_camera rs_camera.launch
+rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.01 image:=/camera/color/image_raw camera:=/camera --no-service-check
+</code></pre></div></div>
+
+<p>​		  如上面的命令所示，首先需要启动我们的realsense相机，之后再调用相机标定的程序，之后的参数分别是标定板的型号、方块的边长、图像的话题和相机的前缀。需要注意的是我们购买的标定板显示的是12*9，但是在运行程序时输入的参数<code class="highlighter-rouge">size</code>指的是角点的数量，因此需要设置为11*8程序才能正常运行；除此之外，由于realsense相机并没有提供<code class="highlighter-rouge">/set_camera_info</code>的服务，因此需要在参数中增加<code class="highlighter-rouge">--no-service-check</code>，而且标定完成后的的结果只能保存而不能直接应用给相机。</p>
+
+<div align="center">
+  <img src="../09/相机标定程序示意图.png" width="75%" height="75%" />
+</div>
+
+<p>​		  如上图所示，正确运行的程序可以看到很多被彩色点标注的角点，在标定时需要按照X方向、Y方向、垂直方向也就是远近和倾斜一共四个因素移动标定板，直到每一个横条都显示为绿色时就可以点击<code class="highlighter-rouge">Calibrate</code>计算内参矩阵了，计算需要耗时半分钟或者更久，结束之后点击<code class="highlighter-rouge">Save</code>保存标定的结果就可以啦！标定的结果如下所示：</p>
+
+<div align="center">
+  <img src="../09/标定矩阵结果.png" width="75%" height="75%" />
+</div>
+
+<p>​		  在ost.yaml和ost.txt中记录了相机标定得到的内参矩阵，之后我们可以在编程中使用OpenCV或其他你喜欢的工具调用这一矩阵对获得的图像进行去畸变的操作，这部分内容我们就不在本课程中进行介绍了。接下来让我们简短的介绍如何使用笔记本电脑自带的相机进行标定。</p>
+
+<h2 id="usb相机标定">USB相机标定</h2>
+
+<p>​		  首先使用下面这行命令去安装usb相机在ROS下的驱动程序：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install ros-kinetic-usb-cam
+</code></pre></div></div>
+
+<p>​		  通常不会出现什么问题，接下来就和之前的内容一样启动<code class="highlighter-rouge">camera_calibration</code>程序，不过要根据usb_cam的话题消息进行一些改变：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.01 image:=/usb_cam/image_raw camera:=/usb_cam
+</code></pre></div></div>
+
+<p>​		  之后便是一样的标定过程，需要说明的是标定计算结束并成功保存时将会出现下面的画面，保存的文件位置在<code class="highlighter-rouge">/tmp/calibrationdata.tar.gz</code>：</p>
+
+<div align="center">
+  <img src="../09/标定结果保存终端示意图.png" width="75%" height="75%" />
+</div>
+
+<h2 id="总结">总结</h2>
+
+<p>​		  在本节课中我们介绍了Intel® RealSense D415相机的SDK和驱动程序的安装，ROS中相机标定程序camera_calibration的安装，演示了使用D415相机和笔记本电脑的usb相机进行内参标定的方法和注意事项。</p>
+
+
+  <!-- 引入share模块 -->
+  
+  <div class="social-share-wrapper">
+    <div class="social-share"></div>
+  </div>
+
+
+<!-- share.js -->
+<script src="/assets/js/social-share.min.js"></script>
+<script>
+  socialShare('.social-share', {
+    sites: [
+      
+        'qq'
+        ,
+        
+      
+        'wechat'
+        ,
+        
+      
+        'weibo'
+        ,
+        
+      
+        'twitter'
+        ,
+        
+      
+        'facebook'
+        
+      
+    ],
+    wechatQrcodeTitle: "分享到微信朋友圈",
+    wechatQrcodeHelper: '期待在朋友圈见到这篇文章'
+  });
+</script>
+
+</div>
+
+<!-- 底部锚点 -->
+<a id="htmldown" name="htmldown"></a>
+<!-- 引入评论模块 -->
+
+
+
+    <section class="post-footer-item comment">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDI2OS8xMDgwNg=="></div>
+    </section>
+
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+
+           if (typeof LivereTower === 'function') { return; }
+
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+    </script>
+    <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    <!-- City版安装代码已完成 -->
+
+
+
+
+
+<!-- 引入goto模块 -->
+<div class="bounceInRight animated go">
+  <a title="顶部切换页面" class="gototop" href="#htmlup" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Top
+    </div>
+  </a>
+  <a title="底部有livere评论哦" class="gotobottom" href="#htmldown" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Foot
+    </div>
+  </a>
+</div>
+
+<!-- 引入页面底部模块 -->
+<footer id="bottom">
+  <br>
+  <span>James' HomePage ©
+  
+  
+    2018
+    -
+  
+  2019
+  <br>
+  Powered by <a href="https://www.jekyll.com.cn/">Jekyll</a> | <a href="https://github.com/xukimseven/HardCandy-Jekyll">HardCandy-Jekyll</a></span>
+</footer>
+
+
+<!-- 引用wow.js的动画效果 -->
+<script src="/assets/js/wow.js"></script>
+<script>
+    var wow = new WOW({
+        boxClass: 'wow',
+        animateClass: 'animated',
+        // offset: 600,
+        mobile: true,
+        live: true
+    });
+    wow.init();
+</script>
+<!-- 页面刷新回到顶部 -->
+<script>
+    window.onbeforeunload = function(){
+        //刷新后页面自动回到顶部
+        document.documentElement.scrollTop = 0;  //ie下
+        document.body.scrollTop = 0;  //非ie
+    }
+</script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

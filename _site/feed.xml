@@ -1,4 +1,430 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-08-09T09:04:18+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">PyTorch 入门(2)</title><link href="http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html" rel="alternate" type="text/html" title="PyTorch 入门(2)" /><published>2019-08-05T00:00:00+08:00</published><updated>2019-08-05T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2)</id><content type="html" xml:base="http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html">&lt;h1 id=&quot;pytorch入门2&quot;&gt;PyTorch入门(2)&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-08-09T14:42:57+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">ROS 内参标定</title><link href="http://localhost:4000/2019/08/09/ROS-%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A.html" rel="alternate" type="text/html" title="ROS 内参标定" /><published>2019-08-09T00:00:00+08:00</published><updated>2019-08-09T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/09/ROS%20%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A</id><content type="html" xml:base="http://localhost:4000/2019/08/09/ROS-%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A.html">&lt;h1 id=&quot;ros-内参标定&quot;&gt;ROS 内参标定&lt;/h1&gt;
+
+&lt;p&gt;​		  在这一小节中我们将会介绍如何使用Intel的Realsense D415相机的RGB部分进行内参的标定，除此之外也会使用笔记本电脑自带的摄像头进行标定以让每一位同学都能有机会进行操作。在给Realsense相机进行标定之前我们需要：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;安装最新的Intel® RealSense™ SDK 2.0&lt;/li&gt;
+  &lt;li&gt;安装Realsense与ROS通信的Package：realsense-ros&lt;/li&gt;
+  &lt;li&gt;安装用于相机标定的Package：camera_calibration&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;安装依赖package&quot;&gt;安装依赖Package&lt;/h2&gt;
+
+&lt;p&gt;​		  首先是安装最新的Intel® RealSense™ SDK 2.0，可以按照官方repo的&lt;a href=&quot;https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages&quot;&gt;文档&lt;/a&gt;进行安装。首先添加注册服务器的public key，之后检查代理配置，接下来就是将服务器加入到仓库列表中安装需要的四个package即可：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE
+export http_proxy=&quot;http://&amp;lt;proxy&amp;gt;:&amp;lt;port&amp;gt;&quot;
+
+sudo add-apt-repository &quot;deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main&quot; -u
+sudo apt-get install librealsense2-dkms
+sudo apt-get install librealsense2-utils
+sudo apt-get install librealsense2-dev
+sudo apt-get install librealsense2-dbg
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  如果需要更新一个功能包可以使用这两句命令：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get update
+sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  接下来是安装Realsense与ROS通信的Package：realsense-ros。首先是进入到我们ROS的工作空间中将Package的代码下载下来并切换到对应的分支，之后就是编译和进行安装：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ~/catkin_ws/src
+git clone https://github.com/IntelRealSense/realsense-ros.git
+cd realsense-ros/
+git checkout `git tag | sort -V | grep -P &quot;^\d+\.\d+\.\d+&quot; | tail -1`
+cd ..
+catkin_make clean
+catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
+catkin_make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  在安装之前需要确保依赖项已经安装过，在这一节课我们假设你已经学习过前面的课程并安装了必要的功能包。如果在编译过程中出错可以直接尝试使用下面这行命令获取缺失的功能包：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get install ros-kinetic-缺失的功能包
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  在编译好之后将Realsense相机通过USB线连接到电脑上后，可以使用这行命令检查是否安装成功并驱动相机：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch realsense2_camera rs_camera.launch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  出现了下面的结果就说明安装成功了：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../09/相机驱动成功.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;​		  可用&lt;code class=&quot;highlighter-rouge&quot;&gt;rosrun rqt_image_view rqt_image_view&lt;/code&gt;选择&lt;code class=&quot;highlighter-rouge&quot;&gt;/camera/color/image_raw&lt;/code&gt;查看相机收到的图像信息。需要说明的是，相机获取图像信息是有一个帧率的，如果你的计算机无法处理高帧率的图像可以在launch文件中修改&lt;code class=&quot;highlighter-rouge&quot;&gt;color_fps&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;depth_fps&lt;/code&gt;等参数以防止出现溢出现象。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../09/相机图像.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;​		  最后一部分就是安装用于相机标定的Package：camera_calibration。这个Package的安装可以参考&lt;a href=&quot;http://wiki.ros.org/camera_calibration&quot;&gt;ROS Wiki&lt;/a&gt;的内容，首先将放在Github托管的程序下载在你的ROS工作空间里，&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ~/catkin_ws/src
+git clone -b kinetic https://github.com/ros-perception/image_pipeline
+cd ../
+catkin_make
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  或者也可以简单粗暴的使用apt-get进行安装：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get install ros-kinetic-camera-calibration
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;realsense相机标定&quot;&gt;Realsense相机标定&lt;/h2&gt;
+
+&lt;p&gt;​		  之后可以选择自己打印或者购买相机标定需要的标定板，本节课中我们使用的标定板型号为&lt;code class=&quot;highlighter-rouge&quot;&gt;GP150-12*9&lt;/code&gt;，有了标定板之后就可以开始进行相机标定了：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch realsense2_camera rs_camera.launch
+rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.01 image:=/camera/color/image_raw camera:=/camera --no-service-check
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  如上面的命令所示，首先需要启动我们的realsense相机，之后再调用相机标定的程序，之后的参数分别是标定板的型号、方块的边长、图像的话题和相机的前缀。需要注意的是我们购买的标定板显示的是12*9，但是在运行程序时输入的参数&lt;code class=&quot;highlighter-rouge&quot;&gt;size&lt;/code&gt;指的是角点的数量，因此需要设置为11*8程序才能正常运行；除此之外，由于realsense相机并没有提供&lt;code class=&quot;highlighter-rouge&quot;&gt;/set_camera_info&lt;/code&gt;的服务，因此需要在参数中增加&lt;code class=&quot;highlighter-rouge&quot;&gt;--no-service-check&lt;/code&gt;，而且标定完成后的的结果只能保存而不能直接应用给相机。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../09/相机标定程序示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;​		  如上图所示，正确运行的程序可以看到很多被彩色点标注的角点，在标定时需要按照X方向、Y方向、垂直方向也就是远近和倾斜一共四个因素移动标定板，直到每一个横条都显示为绿色时就可以点击&lt;code class=&quot;highlighter-rouge&quot;&gt;Calibrate&lt;/code&gt;计算内参矩阵了，计算需要耗时半分钟或者更久，结束之后点击&lt;code class=&quot;highlighter-rouge&quot;&gt;Save&lt;/code&gt;保存标定的结果就可以啦！标定的结果如下所示：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../09/标定矩阵结果.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;​		  在ost.yaml和ost.txt中记录了相机标定得到的内参矩阵，之后我们可以在编程中使用OpenCV或其他你喜欢的工具调用这一矩阵对获得的图像进行去畸变的操作，这部分内容我们就不在本课程中进行介绍了。接下来让我们简短的介绍如何使用笔记本电脑自带的相机进行标定。&lt;/p&gt;
+
+&lt;h2 id=&quot;usb相机标定&quot;&gt;USB相机标定&lt;/h2&gt;
+
+&lt;p&gt;​		  首先使用下面这行命令去安装usb相机在ROS下的驱动程序：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get install ros-kinetic-usb-cam
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  通常不会出现什么问题，接下来就和之前的内容一样启动&lt;code class=&quot;highlighter-rouge&quot;&gt;camera_calibration&lt;/code&gt;程序，不过要根据usb_cam的话题消息进行一些改变：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.01 image:=/usb_cam/image_raw camera:=/usb_cam
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;​		  之后便是一样的标定过程，需要说明的是标定计算结束并成功保存时将会出现下面的画面，保存的文件位置在&lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/calibrationdata.tar.gz&lt;/code&gt;：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../09/标定结果保存终端示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;​		  在本节课中我们介绍了Intel® RealSense D415相机的SDK和驱动程序的安装，ROS中相机标定程序camera_calibration的安装，演示了使用D415相机和笔记本电脑的usb相机进行内参标定的方法和注意事项。&lt;/p&gt;</content><author><name>James</name></author><category term="ROS手眼标定" /><summary type="html">ROS 内参标定</summary></entry><entry><title type="html">内参标定理论介绍</title><link href="http://localhost:4000/2019/08/09/%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html" rel="alternate" type="text/html" title="内参标定理论介绍" /><published>2019-08-09T00:00:00+08:00</published><updated>2019-08-09T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/09/%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D</id><content type="html" xml:base="http://localhost:4000/2019/08/09/%E5%86%85%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html">&lt;h1 id=&quot;内参标定理论介绍&quot;&gt;内参标定理论介绍&lt;/h1&gt;
+
+&lt;p&gt;​		  在任何使用到相机的任务中，相机的内参标定都是一定要进行的，不过大多数购买到的相机都已经进行了提前的标定，不过为了能够更全面的掌握机械臂的手眼标定，我们还是需要掌握相机内参标定的方法。在这节课程中我们将会详细介绍张正友的经典论文&lt;code class=&quot;highlighter-rouge&quot;&gt;A Flexible New Technique fro Camera Calibration&lt;/code&gt;中提出的基于棋盘格的相机标定方法，在之后的课程中也会从实操角度介绍在ROS中如何对相机的内参进行标定。&lt;/p&gt;
+
+&lt;h2 id=&quot;研究重心&quot;&gt;研究重心&lt;/h2&gt;
+
+&lt;p&gt;​		  在学习一个新知识点之前首先需要明确这个问题的重心在哪里，使用的方法又是什么，这样才能够发现问题并有希望作出改进。在获取相机内参数的问题中，我们的核心在于使用已知的变量合理的表示内参数，并使用优化方法最终进行求解。在此之前我们先了解一下何为内参数：&lt;/p&gt;
+
+&lt;p&gt;​		  在使用针孔相机获取三维世界的图像信息时需要经历这样几个过程：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;首先将三维世界中的一点$P=(X,Y,Z)$从世界坐标系通过刚体变换变换到相机所在的坐标系，需要的参数为旋转矩阵$R$和平移向量$t$，称为外参数；&lt;/li&gt;
+  &lt;li&gt;获得了点$P$在相机坐标系下的坐标后，通过针孔相机的模型变换为成像平面上的点$p=(x,y)$；&lt;/li&gt;
+  &lt;li&gt;将点$p$从成像平面通过缩放和平移变换变换到像素坐标系上的点$p=(u,\nu)$。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;​         若将其转换为矩阵相乘的形式可以写成下面的式子：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+s
+ \left(
+ \begin{matrix}
+   u \\
+   \nu \\
+   1 
+  \end{matrix}
+  \right)
+ =
+ \left[
+ \begin{matrix}
+   \alpha &amp; 0 &amp; c_x \\
+   0 &amp; \beta &amp; c_y \\
+   0 &amp; 0 &amp; 1
+  \end{matrix}
+  \right]
+   \left[
+ \begin{matrix}
+   f &amp; 0 &amp; 0 &amp; 0 \\
+   0 &amp; f &amp; 0 &amp; 0 \\
+   0 &amp; 0 &amp; 1 &amp; 0
+  \end{matrix}
+  \right]
+   \left[
+ \begin{matrix}
+   R &amp; t \\
+   0^T &amp; 1 
+  \end{matrix}
+  \right]
+   \left(
+ \begin{matrix}
+   X \\
+   Y \\
+   Z \\
+   1
+  \end{matrix}
+  \right)
+  \\
+  =
+   \left[
+ \begin{matrix}
+   f_x &amp; 0 &amp; c_x &amp; 0 \\
+   0 &amp; f_y &amp; c_y &amp; 0 \\
+   0 &amp; 0 &amp; 1 &amp; 0
+  \end{matrix}
+  \right]
+     \left[
+ \begin{matrix}
+   R &amp; t \\
+   0^T &amp; 1 
+  \end{matrix}
+  \right]
+     \left(
+ \begin{matrix}
+   X \\
+   Y \\
+   Z \\
+   1
+  \end{matrix}
+  \right) %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;​		  内参数被记做$A$，它表示将坐标系从成像平面变换到像素坐标系的变换矩阵：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+A=
+ \left[
+ \begin{matrix}
+   f_x &amp; 0 &amp; c_x \\
+   0 &amp; f_y &amp; c_y \\
+   0 &amp; 0 &amp; 1
+  \end{matrix}
+  \right] %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;​		  而之前所说的外参数$R$和$t$则有上式中的这个矩阵进行表示：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\left[
+ \begin{matrix}
+   R &amp; t \\
+   0^T &amp; 1 
+  \end{matrix}
+  \right] %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;​		  其中$f_{x}=\alpha f$，$f_{y}=\beta f$。而$\alpha,\beta$分别表示图像上单位距离内$x$方向和$y$方向的像素个数，因此$f_x,f_y$将相机的焦距变换为在$x,y$方向上的像素度量表示。除此以外，为了不失一般性通常还会在内参矩阵$A$上增加一个参数$\gamma$：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+A=
+ \left[
+ \begin{matrix}
+   f_x &amp; \gamma &amp; c_x \\
+   0 &amp; f_y &amp; c_y \\
+   0 &amp; 0 &amp; 1
+  \end{matrix}
+  \right] %]]&gt;&lt;/script&gt;
+
+&lt;h2 id=&quot;射影变换&quot;&gt;射影变换&lt;/h2&gt;
+
+&lt;p&gt;​		  在张正友标定法中使用棋盘格标定板进行相机标定，标定板平面是三维世界中的一个平面$\Pi$，而标定板映射到的像素坐标系下的像又是另一个平面$\pi$，因此可以使用射影变换实现两个平面之间的映射，而这只需要知道两个平面的对应点坐标即可求得两个平面之间的射影变换矩阵$H$。&lt;/p&gt;
+
+&lt;p&gt;​		  在进行相机标定的时候，我们的标定板都是特制的具有确定型号的，而在运行标定程序时也需要将所使用的标定板的参数输入进去，在执行程序时提取标定板上角点的坐标，而对应角点在像素坐标系下图像的坐标可以通过程序来获取，因此便可以得到两个平面之间的映射。其之间的关系和之前描述的一样，改写成下式：
+&lt;script type=&quot;math/tex&quot;&gt;p=A[R|t]P&lt;/script&gt;
+​		  其中$p$是像素坐标，$P$是棋盘坐标，因此由刚才对射影变换矩阵的叙述可以得到：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;H=A[R|t] \\
+p=HP&lt;/script&gt;
+
+&lt;p&gt;​		  设棋盘格所在平面为世界坐标系中$Z=0$的平面，这样棋盘格的任一角点P的世界坐标系为$(X,Y,0)$，则有：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;s
+ \left(
+ \begin{matrix}
+   u \\
+   \nu \\
+   1 
+  \end{matrix}
+  \right)
+ =
+A[R\ \ t]
+   \left(
+ \begin{matrix}
+   X \\
+   Y \\
+   0 \\
+   1
+  \end{matrix}
+  \right)
+  =
+  A[r_1\ \ r_2 \ \ r_3 \ \ t]
+   \left(
+ \begin{matrix}
+   X \\
+   Y \\
+   0 \\
+   1
+  \end{matrix}
+  \right)
+  =
+  A[r_1 \ \ r_2 \ \ t]
+   \left(
+ \begin{matrix}
+   X \\
+   Y \\
+   1
+  \end{matrix}
+  \right)
+  \\
+  H = \lambda A[r_1 \ \ r_2 \ \ t] = [h_1 \ \ h_2 \ \ h_3]&lt;/script&gt;
+
+&lt;p&gt;​		  将射影变换矩阵转化为这个形式之后，便可以使用棋盘平面和成像平面上对应的点计算射影变换矩阵了。&lt;/p&gt;
+
+&lt;h2 id=&quot;结果推导&quot;&gt;结果推导&lt;/h2&gt;
+
+&lt;p&gt;  由刚才的式子我们可以得到以下的等式：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\left\{
+\begin{aligned}
+r_1=\lambda A^{-1}h_1 \\
+r_2=\lambda A^{-1}h_2 \\
+t = \lambda A^{-1}h_3
+\end{aligned}
+\right.&lt;/script&gt;
+
+&lt;p&gt;  而旋转矩阵$R$是正交矩阵，因此具有以下性质。也就是其列向量之间的内积为0，而每个列向量的模均为1：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r_1^T r_2=0 \\
+||r_1||=||r_2||=1&lt;/script&gt;
+
+&lt;p&gt;​		  至此，我们得到了在内参标定中非常重要的等式，它是对应与一个射影变换矩阵的约束式，它仅仅表示一对相对应的图像所表示的射影变换矩阵，而在实际操作中往往会取多对图像来计算射影变换矩阵：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
+h_1^T(A^{-1})^TA^{-1}h_2 = 0\\
+h_1^T(A^{-1})^TA^{-1}h_1 = h_2^T(A^{-1})^TA^{-1}h_2 = 1
+\end{cases}&lt;/script&gt;
+
+&lt;p&gt;​		  现在让我们把上式中间那部分矩阵$(A^{-1})^TA^{-1}$改写一下，改写成下面这个矩阵，具体的推导太过于复杂不在这里介绍，感兴趣的可以翻看本节课资料中的论文原件进行研读：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+B=(A^{-1})^TA^{-1}=
+\left[
+ \begin{matrix}
+   B_{11} &amp; B_{12} &amp; B_{13} \\
+   B_{21} &amp; B_{22} &amp; B_{23} \\
+   B_{31} &amp; B_{32} &amp; B_{33}
+  \end{matrix}
+\right]
+=
+\left[
+ \begin{matrix}
+   \frac{1}{\alpha ^2} &amp; -\frac{\gamma}{\alpha^2\beta} &amp; \frac{v_0\gamma-u_0\beta}{\alpha^2\beta} \\
+   -\frac{\gamma}{\alpha^2\beta} &amp; \frac{\gamma^2}{\alpha^2\beta^2}+\frac{1}{\beta^2} &amp; -\frac{\gamma(v_0\gamma-u_0\beta)}{\alpha^2\beta^2}-\frac{v_0}{\beta^2} \\
+   \frac{v_0\gamma-u_0\beta}{\alpha^2\beta} &amp; -\frac{\gamma(v_0\gamma-u_0\beta)}{\alpha^2\beta^2}-\frac{v_0}{\beta^2} &amp; \frac{(v_0\gamma-u_0\beta)^2}{\alpha^2\beta^2}+\frac{v_0}{\beta^2}+1
+  \end{matrix}
+\right] %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;​		  可以看到这个矩阵是一个对称矩阵，因此其仅具有6个未知量，可以将其写成更为紧凑的格式：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;b=[B_{11},B_{12},B_{22},B_{13},B_{23},B_{33}]&lt;/script&gt;
+
+&lt;p&gt;​		  接下来就应该结合刚才的约束方程来推导得到射影变换矩阵的表达形式了，令$h_i$为矩阵$H$的第$i$个行向量即$h_i=[h_{i1}, h_{i2}, h_{i3}]^T$，则结合之前式子有：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;h_i(A^{-1})^TA^{-1}h_j = h_iBh_j=v_{ij}^Tb&lt;/script&gt;
+
+&lt;p&gt;其中$v_{ij}=[h_{i1}h_{j1},h_{i1}h_{j2}+h_{i2}h_{j1},h_{i2}h_{j2},h_{i3}h_{j1}+h_{i1}h_{j3},h_{i3}h_{j2}+h_{i2}h_{j3},h_{i3}h_{j3}]$&lt;/p&gt;
+
+&lt;p&gt;​		  因此可以将约束方程改写为：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
+h_1^T(A^{-1})^TA^{-1}h_2 = 0\\
+h_1^T(A^{-1})^TA^{-1}h_1 = h_2^T(A^{-1})^TA^{-1}h_2 = 1
+\end{cases}
+\Rightarrow
+\begin{cases}
+v_{22}^Tb = 0\\
+v_{11}b=v_{12}b
+\end{cases}&lt;/script&gt;
+
+&lt;p&gt;​		  写成矩阵形式有：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\left[
+\begin{matrix}
+v_{12}^T \\
+v_{11}-v_{22}
+\end{matrix}
+\right]
+b
+= Vb =0&lt;/script&gt;
+
+&lt;p&gt;​		  这是仅仅使用一对图像计算射影变换矩阵时的方程，当采集到了多组图像时只需要将对应的$V$矩阵进行拼接即可。对于方程$Vb=0$的求解问题，最常见的方法就是最小二乘法，而在现代方法中常常使用$SVD$分解来求解这类问题，对SVD分解感兴趣的同学可以自行查找，这是一个十分常见的方法。在张正友论文的附录中给出了内参矩阵的计算方法：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
+v_0 = (B_{12}B_{13}-B_{11}B_{23})/(B_{11}B_{22}-B_{12}^2) \\
+u_0 = \gamma v_0/\beta - B_{13}\alpha^2/\lambda \\
+\lambda = B_{33}-[B_{13}^2+v_0(B_{12}B_{13}-B_{11}B_{23})]/B_{11} \\
+\alpha = \sqrt{\lambda / B_{11}} \\
+\beta = \sqrt{\lambda B_{11} / (B_{11}B_{22}-B_{12}^2)} \\
+\gamma = -B_{12}\alpha^2\beta / \lambda
+\end{cases}&lt;/script&gt;
+
+&lt;h2 id=&quot;消除畸变&quot;&gt;消除畸变&lt;/h2&gt;
+
+&lt;p&gt;​		  在真实的相机中会因为光学透镜固有的问题而产生透视失真，通常可以将其分为枕形畸变、桶形畸变和线性畸变，其中枕形畸变和桶形畸变由于是径向对称的，因此也被称为径向畸变，使用下面的式子来表示径向畸变：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{x} = x + x[k_1(x^2+y^2)+k_2(x^2+y^2)^2] \\
+\hat{y} = y + y[k_1(x^2+y^2)+k_2(x^2+y^2)^2]&lt;/script&gt;
+
+&lt;p&gt;​		  其中$k_1,k_2$表示径向畸变的系数，而且径向畸变的中心是相机的中心，则有：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{\mu} = \mu + (\mu-\mu_0)[k_1(x^2+y^2)+k_2(x^2+y^2)^2] \\
+\hat{\nu} = \nu + (\nu-\nu_0)[k_1(x^2+y^2)+k_2(x^2+y^2)^2]&lt;/script&gt;
+
+&lt;p&gt;​		  继续将上式改写成矩阵形式，这个式子是从一幅图像上取点得到的，假设有$n$幅图像和$m$个图像点，那么便可以得到$2mn$个方程：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\left[
+\begin{matrix}
+(\mu-\mu_0)(x^2+y^2) &amp; (\mu-\mu_0)(x^2+y^2)^2 \\
+(\nu-\nu_0)(x^2+y^2) &amp; (\nu-\nu_0)(x^2+y^2)^2
+\end{matrix}
+\right]
+\left[
+\begin{matrix}
+k_1 \\
+k_2
+\end{matrix}
+\right]
+=
+\left[
+\begin{matrix}
+\hat{\mu}-\mu \\
+\hat{\nu}-\nu
+\end{matrix}
+\right] %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;​		  之后同样可以使用SVD对矩阵进行分解进而得到畸变参数$k=[k_1,k_2]^T$的最小二乘解，在得到畸变参数后便可以先对图像进行去畸变处理，之后在使用进行过去畸变的图像来估计相机的内参：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;Dk=d \\
+k = [k_1 \ \ k_2]^T = (D^TD)^{-1}D^Td&lt;/script&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;​		  在本节课中详细的介绍了张正友的内参相机标定法，使用这一方法可以使用棋盘格标定板快速的获得相机的内参数。这一方法已经十分成熟，在实际使用中并不需要我们手写代码去实现这一功能，在下一节课中我们将会学习如何使用ROS中的程序快速的实现相机的内参标定。&lt;/p&gt;
+
+&lt;h2 id=&quot;参考资料&quot;&gt;参考资料&lt;/h2&gt;
+
+&lt;p&gt;[1] https://baike.baidu.com/item/镜头畸变/5120871&lt;/p&gt;
+
+&lt;p&gt;[2] https://www.cnblogs.com/wangguchangqing/p/8335131.html&lt;/p&gt;
+
+&lt;p&gt;[3] Zhang, Z. A flexible new technique for camera calibration[J]. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2000, 22(11):0-1334.&lt;/p&gt;</content><author><name>James</name></author><category term="ROS手眼标定" /><summary type="html">内参标定理论介绍</summary></entry><entry><title type="html">PyTorch 入门(2)</title><link href="http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html" rel="alternate" type="text/html" title="PyTorch 入门(2)" /><published>2019-08-05T00:00:00+08:00</published><updated>2019-08-05T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2)</id><content type="html" xml:base="http://localhost:4000/2019/08/05/PyTorch%E5%85%A5%E9%97%A8(2).html">&lt;h1 id=&quot;pytorch入门2&quot;&gt;PyTorch入门(2)&lt;/h1&gt;
 
 &lt;h2 id=&quot;分类任务&quot;&gt;分类任务&lt;/h2&gt;
 
@@ -266,7 +692,6 @@ Epoch:2 | Step:1 | batch x:[10. 4. 8. 1. 5.] | batch y:[1. 7. 3. 10. 6.]
 &lt;/div&gt;
 
 &lt;div align=&quot;center&quot;&gt; 图1  LOAM算法流程图 &lt;/div&gt;
-
 &lt;h2 id=&quot;符号说明&quot;&gt;符号说明&lt;/h2&gt;
 
 &lt;p&gt;​		接下来将会出现一系列的公式和符号，为了不产生混淆我们先在此进行介绍，之后的讲解中如有不理解的仍然会停下来进行说明，不过为了能够更快的继续我的们的课程，提前进行符号说明是必须的：&lt;/p&gt;
@@ -319,7 +744,6 @@ Epoch:2 | Step:1 | batch x:[10. 4. 8. 1. 5.] | batch y:[1. 7. 3. 10. 6.]
 &lt;/div&gt;
 
 &lt;div align=&quot;center&quot;&gt; 图3 特征点选取结果示意图 &lt;/div&gt;
-
 &lt;h3 id=&quot;特征点匹配&quot;&gt;特征点匹配&lt;/h3&gt;
 
 &lt;p&gt;​		里程计算法用于估计激光雷达在一次扫描中的运动，我们设$t_{k}$为第$k$次扫描的起始时间，在第$k-1$次扫描的最后时刻将这一次扫描中采集到的点云数据映射到时间戳$t_{k}$上，这些被映射过的点云被记做$\bar P_{k-1}$，在第k次扫描中这部分数据和在第$k$次扫描时逐渐采集到的点云数据$P_{k}$一起估计激光雷达的运动。&lt;/p&gt;
@@ -386,7 +810,6 @@ Epoch:2 | Step:1 | batch x:[10. 4. 8. 1. 5.] | batch y:[1. 7. 3. 10. 6.]
 &lt;/div&gt;
 
 &lt;div align=&quot;center&quot;&gt; 图5 激光里程计算法 &lt;/div&gt;
-
 &lt;h2 id=&quot;激光建图&quot;&gt;激光建图&lt;/h2&gt;
 
 &lt;p&gt;​		激光建图的整个流程和激光里程计实质上并没有什么差别，只不过我们需要进行匹配的点云是地图点云$Q_{k-1}$而已。在下图中黑色部分的是已经建好的地图中的点云，绿色部分是我们在第$k$次扫描时获取到的点云数据映射到世界坐标系${W}$下的结果，蓝色的轨迹线是在第$k$次扫描以前激光雷达的运动轨迹，而橙色的轨迹线则表示在第$k$次扫描时激光雷达运动的轨迹。&lt;/p&gt;
