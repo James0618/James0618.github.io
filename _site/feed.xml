@@ -1,4 +1,454 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-08-10T17:05:53+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">ROS 外参标定</title><link href="http://localhost:4000/2019/08/10/ROS-%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A.html" rel="alternate" type="text/html" title="ROS 外参标定" /><published>2019-08-10T00:00:00+08:00</published><updated>2019-08-10T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/10/ROS%20%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A</id><content type="html" xml:base="http://localhost:4000/2019/08/10/ROS-%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A.html">&lt;h1 id=&quot;ros-外参标定&quot;&gt;ROS 外参标定&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-08-19T15:51:15+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">1 搭建实验环境</title><link href="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html" rel="alternate" type="text/html" title="1 搭建实验环境" /><published>2019-08-19T00:00:00+08:00</published><updated>2019-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/19/1%20%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83</id><content type="html" xml:base="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html">&lt;h1 id=&quot;搭建实验环境&quot;&gt;搭建实验环境&lt;/h1&gt;
+
+&lt;p&gt;  本章将会介绍如何对机械臂进行编程控制，实现的具体任务简单来说是控制机械臂的末端到达目标位姿。要实现这一目标我们需要完成以下几部分内容：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;搭建实验所用到的环境&lt;/li&gt;
+  &lt;li&gt;使用OpenCv + Python利用颜色识别获取目标位姿&lt;/li&gt;
+  &lt;li&gt;使用moveit! + Python控制机械臂到达制定位姿&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;  在本章中使用到的实验环境包括一个UR5机械臂的仿真模型，一个黑色的盒子作为桌子以及桌子上的一个绿色小方块，除此之外还需要一个相机作为传感器加入到Gazebo仿真模型中；在识别部分，使用OpenCv中的模块对相机获取到的图像进行处理，通过颜色设置合适的阈值获得方块的位置，进而通过发布节点发布机械臂的目标位姿；在机械臂控制部分中通过订阅节点获取识别模块提供的目标位姿，使用moveit!编程在moveit!的规划场景中添加障碍物并进行轨迹规划，最后执行规划以实现控制Gazebo仿真模型中的UR5机械臂。&lt;/p&gt;
+
+&lt;p&gt;  在搭建实验环境这一步骤中总共分为三个部分：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;下载并编译UR5机械臂的仿真模型&lt;/li&gt;
+  &lt;li&gt;在Gazebo的世界模型中添加桌子及方块&lt;/li&gt;
+  &lt;li&gt;在Gazebo中使用camera插件并进行调试&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;ur5机械臂模型&quot;&gt;UR5机械臂模型&lt;/h2&gt;
+
+&lt;p&gt;  首先是UR5的机械臂仿真模型，如果你已经看过了手眼标定的部分，那此时你的计算机上应该已经存在&lt;code class=&quot;highlighter-rouge&quot;&gt;universal_robot&lt;/code&gt;这个文件夹了，如果没有则按照下面的程序进行下载并编译，具体过程不在这里重复叙述了：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get install ros-kinetic-moveit
+sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+sudo apt-get install ros-kinetic-industrial-core
+
+cd ~/catkin_ws/src
+git clone https://github.com/ros-industrial/universal_robot.git
+
+cd ../
+rosdep install --from-paths src --ignore-src --rosdistro kinetic
+catkin_make
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  完成之后将会在你的工作空间中出现一个&lt;code class=&quot;highlighter-rouge&quot;&gt;universal_robot&lt;/code&gt;文件夹，这个文件夹内的&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_description&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_gazebo&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_moveit_config&lt;/code&gt;是本部分所需要的内容。其中&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_description&lt;/code&gt;这个Package中有UR5机械臂的URDF描述文件，在&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_gazebo&lt;/code&gt;这个Package中有UR5机械臂在Gazebo仿真模型中的驱动文件包括一些控制关节的定义等，在&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_moveit_config&lt;/code&gt;中则是实现机械臂轨迹规划的一些关键配置。下面就让我们看看如何编写launch文件使用这些Package中我们需要的部分。&lt;/p&gt;
+
+&lt;p&gt;  首先在工作空间下新建一个package，我们将它命名为&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_grasping&lt;/code&gt;好了，在新Package的CMakeLists.txt文件中添加这些Package作为依赖：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  cv_bridge
+  image_transport
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_visual_tools
+  roscpp
+  rospy
+  sensor_msgs
+  std_msgs
+  tf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  当然package.xml文件也做相应的更改，具体的可以查看附件中的文件进行参考学习。在&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_grasping&lt;/code&gt;的文件夹中新建两个文件夹：&lt;code class=&quot;highlighter-rouge&quot;&gt;launch&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;scripts&lt;/code&gt;，分别用来存放启动节点的launch文件和用来实现功能的Python文件。之后在launch文件夹下新建一个名为&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_grasping.launch&lt;/code&gt;的文件用来启动节点。&lt;/p&gt;
+
+&lt;p&gt;  这个launch文件需要实现的功能是启动UR5机械臂在Gazebo中的仿真模型和用于轨迹规划的moveit!模块，分别是&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_gazebo&lt;/code&gt;中的&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.launch&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_moveit_config&lt;/code&gt;中的&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_moveit_planning_execution.launch&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;moveit_rviz.launch&lt;/code&gt;文件：&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;launch&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;include&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;file=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(find ur_gazebo)/launch/ur5_with_table_and_camera.launch&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;include&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;file=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;arg&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sim&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/include&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;include&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;file=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(find ur5_moveit_config)/launch/moveit_rviz.launch&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;arg&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;config&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/include&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/launch&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  在调用&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_moveit_planning_execution.launch&lt;/code&gt;时需要将参数&lt;code class=&quot;highlighter-rouge&quot;&gt;sim&lt;/code&gt;设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;以代表我们是在仿真环境中进行驱动的，在调用&lt;code class=&quot;highlighter-rouge&quot;&gt;moveit_rviz.launch&lt;/code&gt;时将参数&lt;code class=&quot;highlighter-rouge&quot;&gt;config&lt;/code&gt;设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;可以在打开RViz时直接使用配置好的界面。注意到我们并没有调用&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.launch&lt;/code&gt;这个文件，这是因为我们需要对他进行修改，为了避免对原来的文件造成影响因此新建了一个launch文件。&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/RViz界面.png&quot; width=&quot;45%&quot; height=&quot;45%&quot; /&gt;
+  &lt;img src=&quot;../19/Gazebo界面.png&quot; width=&quot;45%&quot; height=&quot;45%&quot; /&gt;
+&lt;/div&gt;
+&lt;div align=&quot;center&quot;&gt; 图1  RViz示意图 &amp;amp; Gazebo示意图 &lt;/div&gt;
+&lt;p&gt;  现在启动这个launch文件，将会出现Gazebo和RViz两个界面，在RViz中可以拖动机器人末端测试moveit!是否成功启动：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch ur5_grasping ur5_grasping.launch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  当然现在在你们的界面中还不会显示出桌子和相机，不要着急，接下来就让我们开始添加这些。但是在此之前需要说明一点，在启动时你会发现机器人的位姿是平躺在地面上的，和图中显示的不太一样。这是UR系列机器人默认的起始位姿，调整到这个位姿是为了放置机械臂遮挡住上方相机的视线，我们可以在&lt;code class=&quot;highlighter-rouge&quot;&gt;/ur_description/urdf&lt;/code&gt;中的&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.urdf.xacro&lt;/code&gt;文件中修改机器人的其实位姿，调整的参数是joint中&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;origin&amp;gt;&lt;/code&gt;里的rpy角度，在调整时可以使用下面的命令打开机械臂的RViz界面进行参考：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch ur_description view_ur5.launch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  调整时需耐心调试角度，可以使用下图中的可视化界面拖动滑轴测试合理的角度，当然也可以直接使用课程附件中已经调整好的模型：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/view模型.png&quot; width=&quot;85%&quot; height=&quot;85%&quot; /&gt;
+&lt;/div&gt;
+&lt;div align=&quot;center&quot;&gt; 图2  view_ur5的界面 &lt;/div&gt;
+&lt;h2 id=&quot;添加桌子和方块&quot;&gt;添加桌子和方块&lt;/h2&gt;
+
+&lt;p&gt;  在&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_gazebo&lt;/code&gt;文件夹下有启动UR5机械臂Gazebo仿真模型的launch文件，&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.launch&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_joint_limited.launch&lt;/code&gt;，而后者启动的机械臂模型是各个关节有限制角度的仿真模型，打开这个文件你会发现他不过是include了&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.launch&lt;/code&gt;之后修改了参数而已：&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;launch&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;arg&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;gui&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;default=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;doc=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Starts gazebo gui&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;include&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;file=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(find ur_gazebo)/launch/ur5.launch&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;arg&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;limited&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;arg&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;gui&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(arg gui)&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/include&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/launch&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  为了不影响原来的结构，我们新建一个名为&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_with_table_and_camera.launch&lt;/code&gt;的launch文件，将&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5.launch&lt;/code&gt;中的内容复制过来后修改添加世界模型的部分，将他的&lt;code class=&quot;highlighter-rouge&quot;&gt;world_name&lt;/code&gt;参数的值修改为&lt;code class=&quot;highlighter-rouge&quot;&gt;$(find ur_gazebo)/worlds/tableObj.world&lt;/code&gt;，也就是我们课程附件中用于描述桌子和方块的世界模型，当然文件夹和对应的文件需要提前放置在这个Package里。&lt;/p&gt;
+
+&lt;p&gt;  在&lt;code class=&quot;highlighter-rouge&quot;&gt;tableObj.world&lt;/code&gt;中首先引用了在&lt;code class=&quot;highlighter-rouge&quot;&gt;tableObj2.world&lt;/code&gt;中的世界设置，随后使用&lt;code class=&quot;highlighter-rouge&quot;&gt;model&lt;/code&gt;标签添加了两个物体，分别是box代表的桌子和Gazebo模型库中的coke_can。至此在实验环境中添加桌子和方块的任务就已经完成了，在&lt;code class=&quot;highlighter-rouge&quot;&gt;tableObj.world&lt;/code&gt;中可以通过修改两个模型的&lt;code class=&quot;highlighter-rouge&quot;&gt;scale&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;pose&lt;/code&gt;两个标签来调整桌子或方块的尺寸和起始位置。为了试验是否成功添加，可以使用刚才的命令打开Gazebo的界面进行查看：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch ur5_grasping ur5_grasping.launch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  值得一提的是，很多人可能在打开Gazebo时遇到长时间黑屏的问题，这是由于Gazebo的模型需要从其服务器上在线下载，为了加快打开速度可以将模型包下载到本地并解压到&lt;code class=&quot;highlighter-rouge&quot;&gt;~/.gazebo/models&lt;/code&gt;文件夹下，下载的方式网上有很多就不在这里详细说明了。&lt;/p&gt;
+
+&lt;h2 id=&quot;添加camera插件&quot;&gt;添加Camera插件&lt;/h2&gt;
+
+&lt;p&gt;  添加Camera插件其实非常简单，相机的模型和xacro文件在网上已经是满天飞了，我们只需要坐享天成就可以了！&lt;/p&gt;
+
+&lt;p&gt;  首先将附件中的sensor文件夹复制到&lt;code class=&quot;highlighter-rouge&quot;&gt;ur_descrption&lt;/code&gt;的urdf文件夹下，之后再在其中新建一个&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_joint_limited_robot_with_camera.urdf.xacro&lt;/code&gt;文件，接下来将&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_joint_limited_robot.urdf.xacro&lt;/code&gt;中的内容复制过来，再在其中添加下面这行程序即可：&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;xacro:include&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;filename=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;$(find ur_description)/urdf/sensors/camera.urdf.xacro&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  这行命令的意义在于将sensor文件夹下的camera模型加载进来，而在这个模型文件中主要做了两件事情：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;搭建相机的外观模型和碰撞模型等&lt;/li&gt;
+  &lt;li&gt;加入Gazebo中的相机插件，使相机能够发布接收到的图像信息&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;  在&lt;code class=&quot;highlighter-rouge&quot;&gt;camera.gazebo.xacro&lt;/code&gt;中你可以通过修改插件的参数来修改相机发布图像信息的消息，也可以修改相机的其他参数。&lt;/p&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;  至此，我们本章所需要的实验环境已经搭载完毕了，现在我们可以使用一条命令：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch ur5_grasping ur5_grasping.launch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  来启动我们的实验环境，我们可以使用它通过编程实现轨迹规划，颜色识别，最后实现控制仿真模型中的机械臂末端到达通过颜色识别获取到的方块所在位置。&lt;/p&gt;</content><author><name>James</name></author><category term="机械臂视觉结合" /><summary type="html">搭建实验环境</summary></entry><entry><title type="html">2 OpenCV颜色识别</title><link href="http://localhost:4000/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html" rel="alternate" type="text/html" title="2 OpenCV颜色识别" /><published>2019-08-19T00:00:00+08:00</published><updated>2019-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/19/2%20OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB</id><content type="html" xml:base="http://localhost:4000/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html">&lt;h1 id=&quot;opencv颜色识别&quot;&gt;OpenCV颜色识别&lt;/h1&gt;
+
+&lt;p&gt;  在机械臂抓取任务中，对物体进行识别是一件十分重要的事情，对物体进行识别的作用一是在于获取其位置以使机械臂末端到达该物体所在位置，二是获取其位姿以确定机械臂末端抓取装置的抓取位姿。&lt;/p&gt;
+
+&lt;p&gt;  在本章中出于简化的目的，将机械臂的抓取任务改为控制机械臂末端到达指定位姿，如果想要实现抓取可以在本章学习的基础上进行拓展，一方面使用搭建环境中学到的内容添加抓取装置，另一方面在本小节学习的基础上增加基于深度学习的物体识别与计算抓取位姿的模块，再结合下一小节中的机械臂moveit!编程则可以实现全套的机械臂抓取任务。以下是物体识别和抓取姿态分析的常见API：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 物体识别
+http://wiki.ros.org/object_recognition
+https://github.com/tensorflow/models/tree/master/research/object_detection
+# 抓取姿态
+http://wiki.ros.org/agile_grasp
+http://wiki.ros.org/moveit_simple_grasps
+http://wiki.ros.org/graspit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  在本小节中我们将使用OpenCv和Python通过颜色进行阈值判断获取方块所在的位置，再通过订阅器和发布器实现与仿真环境的交互。在开始之前，我们最好梳理一下这个模块中需要哪些部分：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;用于接收仿真环境发布的图像消息的接收器&lt;/li&gt;
+  &lt;li&gt;用于对接收到的图像进行处理的回调函数&lt;/li&gt;
+  &lt;li&gt;用于发布处理结果的发布器&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;  那么接下来就让我们开始进行颜色识别的编程实现吧！在&lt;code class=&quot;highlighter-rouge&quot;&gt;ur5_grasping&lt;/code&gt;的scripts文件夹下新建一个recognition.py，要想能够通过rosrun运行这个程序，我们还需要在终端中输入下面命令将这个程序变为可执行程序：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ~/caktin_ws/src/ur5_grasping/scripts
+chmod +x *
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  在程序的第一行要写上&lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#!/usr/bin/env python&lt;/span&gt;&lt;/code&gt;来声明这是一个python文件，接下来就是import我们需要的头文件：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;rospy&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;cv2&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;geometry_msgs.msg&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Pose&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sensor_msgs.msg&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;cv_bridge&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CvBridge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CvBridgeError&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  这些头文件中sys是用来获取终端中输入的参数的；rospy是ROS使用python编程的最重要的api，它提供了发布器和接收器等一系列重要功能；cv2则是OpenCv在Python中的api；numpy则是在Python中用于数组操作的最常用api；cv_bridge是在ROS中使用OpenCv进行图像处理最重要的api，它提供了ROS中图像消息类型和OpenCv可以处理的图像类型之间的转换；而那两个msg的import则是在程序中需要使用的消息类型，Pose是用于描述机械臂末端位姿的，Image则是ROS中的图像消息，可以通过&lt;code class=&quot;highlighter-rouge&quot;&gt;rosmsg show&lt;/code&gt;进行查看：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/Image消息.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+  &lt;img src=&quot;../19/Pose消息.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  接下来定义一个名为Recognition的类并编写初始化函数：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Recognition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'image_recongition'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;anonymous&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image_sub&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Subscriber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/camera/image_raw'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;can_pub&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Publisher&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/recognition/can'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location_pub&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Publisher&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/recognition/location'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Pose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bridge&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CvBridge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Pose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.707&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.707&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  在初始化函数中首先使用rospy初始化了一个名为&lt;code class=&quot;highlighter-rouge&quot;&gt;image_recognition&lt;/code&gt;的节点，接下来是订阅相机话题消息的订阅器，它的回调函数是self.callback，我们将会后面进行介绍；之后是两个发布器，分别用于发布处理后的图像信息和机械臂末端应当到达的目标位姿；接下来的&lt;code class=&quot;highlighter-rouge&quot;&gt;self.bridge = CvBridge()&lt;/code&gt;则声明了一个bridge实例，用于进行数据格式的转换；剩下的就是声明了一个Pose实例用来描述机械臂末端的目标位姿。&lt;/p&gt;
+
+&lt;p&gt;  实际上，通过初始化函数，我们已经将这一模块的整体框架搭建好了，下面就是本模块最重要的回调函数了，所有的处理都在这里进行，下面就让我们来看一下如何编写这一回调函数。&lt;/p&gt;
+
+&lt;p&gt;  最首要的事情就是使用cv_bridge将订阅器接收到的图像消息转换为cv_image：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imgmsg_to_cv2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'bgr8'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CvBridgeError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  之后为了通过颜色更轻松的进行识别，需要将原来的RGB颜色空间转换到HSV颜色空间上来，不了解HSV颜色空间的可以自行查阅相关资料，简单来讲就是把对颜色的描述从三原色的合成转换成了色调H、饱和度S和明度V的合成：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;c1&quot;&gt;# convert bgr image to hsv and find the can by threshold
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;hsv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cvtColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;COLOR_BGR2HSV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;low_green_can&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;upper_green_can&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;mask&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inRange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hsv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;low_green_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;upper_green_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bitwise_and&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mask&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  之后在使用numpy array设置筛选的阈值将图像中绿色的部分筛选出来，其中mask表示对筛选出来的像素进行的标注，而res则表示将这些标注与原图像进行合成后的结果，应当是在一片漆黑的背景中有一团绿色的点，这就是通过颜色识别到的方块：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/res.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  接下来使用的程序是OpenCv中用于标记轮廓使用到的一系列函数，首先将只有方块的那张图像res转换到灰度空间上：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;c1&quot;&gt;# find the center of the can
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;imgray&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cvtColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;COLOR_BGR2GRAY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imgray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hierarchy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;findContours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RETR_TREE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CHAIN_APPROX_SIMPLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;img_contour&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drawContours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  之后再次通过阈值提取到方块占据的像素区域，接下来使用寻找轮廓的函数获得在上一步中选中区域的轮廓contours，接下来使用drawContours在原图中标注轮廓：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/轮廓.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  最后一步，计算方块的中心点。在OpenCv的轮廓处理的程序中，可以生成轮廓包含区域的矩，这些矩被保存在一个字典中，我们可以通过一个中学就学过的式子计算这个区域的重心，也就是程序中的cx和cy：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;c1&quot;&gt;# compute the location of coke_can
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;moments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;cx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'m10'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'m00'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;cy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'m01'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'m00'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv_image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;800.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;90.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;       &lt;span class=&quot;c1&quot;&gt;# the real scale
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;800.0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;90.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.3&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# the real scale
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.125&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location_pub&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;publish&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ZeroDivisionError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;IndexError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    	&lt;span class=&quot;k&quot;&gt;pass&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    	&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;can_pub&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;publish&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv2_to_imgmsg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img_contour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'bgr8'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CvBridgeError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  接下来的一步通过图像和真实之间尺度变换来计算物块在仿真环境中的位置，也就是知道方块在图像中的像素坐标，然后将它映射到仿真环境中的坐标。在这个环节需要我们一些人工操作了，我是在上一小节搭建实验环境的时候改变了方块的位置来观察其在图像中坐标改变的像素数，借此推断出尺度变化的比例。在得到目标位姿后便可以发布修改过的&lt;code class=&quot;highlighter-rouge&quot;&gt;pose_goal&lt;/code&gt;消息了：&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/echo.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  需要注意的是，由于在移动过程中机械臂会遮挡方块导致本模块无法检测到方块，这将会在获得区域以及计算其重心时报错，为了避免这样的情况干扰程序的运行，因此才需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;try - except&lt;/code&gt;进行异常处理。&lt;/p&gt;
+
+&lt;p&gt;  最后，在调用这个模块的时候记得使用&lt;code class=&quot;highlighter-rouge&quot;&gt;rospy.spin()&lt;/code&gt;让其保持工作状态：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Recognition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;spin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;KeyboardInterrupt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Shutting Down!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  以上就是OpenCv颜色识别的全部内容，最主要的是在实现这一功能时清晰的思路，知道自己在干什么知道需要什么，下一节我们就将顺着在这一节中发布的位姿消息实现机械臂控制的功能。&lt;/p&gt;</content><author><name>James</name></author><category term="机械臂视觉结合" /><summary type="html">OpenCV颜色识别</summary></entry><entry><title type="html">3 UR5机械臂控制</title><link href="http://localhost:4000/2019/08/19/3-UR5%E6%9C%BA%E6%A2%B0%E8%87%82%E6%8E%A7%E5%88%B6.html" rel="alternate" type="text/html" title="3 UR5机械臂控制" /><published>2019-08-19T00:00:00+08:00</published><updated>2019-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/19/3%20UR5%E6%9C%BA%E6%A2%B0%E8%87%82%E6%8E%A7%E5%88%B6</id><content type="html" xml:base="http://localhost:4000/2019/08/19/3-UR5%E6%9C%BA%E6%A2%B0%E8%87%82%E6%8E%A7%E5%88%B6.html">&lt;h1 id=&quot;ur5机械臂控制&quot;&gt;UR5机械臂控制&lt;/h1&gt;
+
+&lt;p&gt;  在本小节中将会使用moveit!在Python的api进行编程，实现从颜色识别模块中获得目标位姿信息，进而控制机械臂到达目标位姿。为此，在程序中需要有这样几个部分：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;接收位姿信息的订阅器及其回调函数&lt;/li&gt;
+  &lt;li&gt;在moveit!的规划场景中增加障碍物的函数&lt;/li&gt;
+  &lt;li&gt;实现机械臂控制的函数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;  第一部分十分简单，我们将在最后进行介绍，接下来让我们学习其他部分程序的编写。首先import我们需要的头文件，其中moveit_commander就是在Python中进行moveit!编程最重要的api了：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;#!/usr/bin/env python
+&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;moveit_commander&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;moveit_msgs.msg&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;geometry_msgs.msg&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  声明一个名为Grasping的类，在它的初始化函数中需要初始化一个名为ur5_grasping的节点；之后创建的是规划场景的一个实例，其后的休眠&lt;code class=&quot;highlighter-rouge&quot;&gt;rospy.sleep(1)&lt;/code&gt;一定不能丢掉！初始化需要一定时间，否则将不能成功的添加障碍物；接着就是创建了move_group的一个实例，紧接着需要设置他的一些参数，其中最主要的是后两个参数，将replanning设置为True可以允许moveit!在轨迹规划失败时进行重规划，减少程序报错失效的可能；最后一步则是在规划场景中添加障碍物，如果成功则会在终端中显示&lt;code class=&quot;highlighter-rouge&quot;&gt;OK!&lt;/code&gt;：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Grasping&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;moveit_commander&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;roscpp_initialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ur5_grasping'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;anonymous&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moveit_commander&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PlanningSceneInterface&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+        
+        &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moveit_commander&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MoveGroupCommander&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'manipulator'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_goal_joint_tolerance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.001&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_max_acceleration_scaling_factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_max_velocity_scaling_factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;allow_replanning&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_planning_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'OK!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Failed!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  那么接下来就让我们看看是如何在规划场景中添加障碍物的。首先介绍一下这个障碍物，在没有添加障碍的情况下，机械臂的轨迹规划是完全自由的，为了实现一个简单的移动，轨迹规划的结果甚至有可能绕一个巨大的圈来实现你的目标，在这样的过程中就有可能与环境中的其他物体比如地面等发生碰撞。在这种情况下我们就需要在moveit!的规划场景中添加合适的障碍物，在进行轨迹规划的时候也会选择一条合适的轨迹以保证机械臂不会与环境中的物体发生碰撞。&lt;/p&gt;
+
+&lt;p&gt;  在moveit!的官方文档中有一个十分复杂的例程，我们选取其中需要的部分来实现我们的功能，更加深入的内容可以前往官网进行学习：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://docs.ros.org/kinetic/api/moveit_tutorials/html/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  我们从例程中选择两个函数，其中一个函数是&lt;code class=&quot;highlighter-rouge&quot;&gt;is_ok&lt;/code&gt;。它是用来检测对场景的改变，比如添加物体或者让物体附着于某一关节的操作是否完成，在原例程中还有一个将物体附着与其他关节的函数，&lt;code class=&quot;highlighter-rouge&quot;&gt;is_ok&lt;/code&gt;通过传入的参数巧妙地同时完成了这一任务：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;is_ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;box_is_known&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;box_is_attached&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;is_shutdown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;# Test if the box is in attached objects
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;attached_objects&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_attached_objects&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;is_attached&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;attached_objects&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+
+        &lt;span class=&quot;c1&quot;&gt;# Test if the box is in the scene.
+&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;# Note that attaching the box will remove it from known_objects
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;is_known&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_known_object_names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+        &lt;span class=&quot;c1&quot;&gt;# Test if we are in the expected state
+&lt;/span&gt;        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_is_attached&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;is_attached&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_is_known&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;is_known&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;
+
+        &lt;span class=&quot;c1&quot;&gt;# Sleep so that we give other threads time on the processor
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  而另一函数则是&lt;code class=&quot;highlighter-rouge&quot;&gt;add_box&lt;/code&gt;，顾名思义他是用来在规划场景中添加物体的函数，首先它使用geometry_msg中的PoseStamped设置了盒子的位姿，并将它命名为&lt;code class=&quot;highlighter-rouge&quot;&gt;table&lt;/code&gt;用来表示我们在Gazebo仿真模型中添加的桌子。仅仅添加桌子这一个障碍物是不够的，因为在规划中仍然可能会规划出错误的轨迹，导致机械臂和地面发生碰撞，因此还需要添加一个地面障碍物，方法步骤都和添加桌子是一样的。最终函数的返回值则是is_ok判断的结果，在调用时根据返回值便可以知道是否成功添加障碍物：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;add_box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Add table
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;geometry_msgs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PoseStamped&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;base_link&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.4&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;table&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Add floor
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;geometry_msgs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PoseStamped&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;base_link&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orientation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;floor&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;scene&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;box_pose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;2.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.01&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+    &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_name&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;is_ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;box_is_known&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  需要强调的是，这里的添加障碍物并不是真的在环境中放置了一个物体，执行完这些命令后你不会在Gazebo中发现任何的改变，但是在RViz界面中你将会看到刚刚被添加进来的桌子和地面，它起到的作用仅仅是用于moveit!在进行轨迹规划时能够避开真实环境或仿真中的物体，因此通常都将这里的障碍物设置的和真实或仿真环境中的障碍物大小一样。&lt;/p&gt;
+
+&lt;p&gt;  在添加完障碍物后，我们就可以编写进行机械臂控制的函数了，在这里我们将实现两个功能：将机械臂归位和控制机械臂到达目标位姿。首先是让机械臂归位，在归位函数中使用之前初始化好的move_group实例对机械臂进行控制，设定目标姿态为之前预设的&lt;code class=&quot;highlighter-rouge&quot;&gt;home&lt;/code&gt;姿态，之后使用&lt;code class=&quot;highlighter-rouge&quot;&gt;move_group.go()&lt;/code&gt;来执行规划，之后休眠一段时间等待机械臂达成目标：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;homing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_named_target&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'home'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;go&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  其次是控制机械臂到达目标位姿，首先使用move_group设定当前的机器人位姿作为起始状态，之后通过函数参数传递进来的目标位姿设定机械臂的目标位姿，接下来就是执行规划的轨迹、清楚目标位姿等后续操作：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;move_to_goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;
+        
+        &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_start_state_to_current_state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_pose_target&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pose_goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;n&quot;&gt;plan&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;go&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;        
+        &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;move_group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clear_pose_targets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  而在程序中实例化我们刚刚创建的类时，仅仅这些是不够的，因为我们还没有从上一个模块中获取目标位姿，因此需要创建一个接收器用来接收目标位姿的消息，与此同时还要声明一个全局变量用来从回调函数中获取目标位姿：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;goal&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;goal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;
+        
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;location_sub&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rospy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Subscriber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/recognition/location'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;geometry_msgs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Pose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;demo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Grasping&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;demo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;homing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;demo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move_to_goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;goal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  至此我们的任务就全部完成了！现在就让我们试验一下吧，首先需要启动实验环境的仿真程序，接下来打开颜色识别的程序，然后可以使用&lt;code class=&quot;highlighter-rouge&quot;&gt;rostopic echo&lt;/code&gt;检查消息的内容来判断程序是否运行正常，最后就是打开抓取的程序完成我们的任务了！&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;roslaunch ur5_grasping ur5_grasping.launch
+rosrun ur5_grasping recognition.py
+rosrun ur5_grasping ur5_grasping.py
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+  &lt;img src=&quot;../19/RViz最终结果.png&quot; width=&quot;45%&quot; height=&quot;45%&quot; /&gt;
+  &lt;img src=&quot;../19/Gazebo最终结果.png&quot; width=&quot;45%&quot; height=&quot;45%&quot; /&gt;
+&lt;/div&gt;</content><author><name>James</name></author><category term="机械臂视觉结合" /><summary type="html">UR5机械臂控制</summary></entry><entry><title type="html">ROS 外参标定</title><link href="http://localhost:4000/2019/08/10/ROS-%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A.html" rel="alternate" type="text/html" title="ROS 外参标定" /><published>2019-08-10T00:00:00+08:00</published><updated>2019-08-10T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/10/ROS%20%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A</id><content type="html" xml:base="http://localhost:4000/2019/08/10/ROS-%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A.html">&lt;h1 id=&quot;ros-外参标定&quot;&gt;ROS 外参标定&lt;/h1&gt;
 
 &lt;p&gt;  在本小节中将会介绍如何使用ROS中的easy_handeye功能包进行基于UR5机械臂和Realsense相机进行手眼标定，为了实现这一目标我们需要进行如下准备：&lt;/p&gt;
 
@@ -835,171 +1285,4 @@ Epoch:2 | Step:1 | batch x:[10. 4. 8. 1. 5.] | batch y:[1. 7. 3. 10. 6.]
     &lt;span class=&quot;n&quot;&gt;optimizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;step&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;​		&lt;code class=&quot;highlighter-rouge&quot;&gt;optimizer.zero_grad()&lt;/code&gt;这一步至关重要！一定不要忘记！&lt;/p&gt;</content><author><name>James</name></author><category term="PyTorch" /><summary type="html">PyTorch</summary></entry><entry><title type="html">Test Jekyll</title><link href="http://localhost:4000/2019/07/25/test-jekyll.html" rel="alternate" type="text/html" title="Test Jekyll" /><published>2019-07-25T00:00:00+08:00</published><updated>2019-07-25T00:00:00+08:00</updated><id>http://localhost:4000/2019/07/25/test-jekyll</id><content type="html" xml:base="http://localhost:4000/2019/07/25/test-jekyll.html">&lt;blockquote&gt;
-  &lt;p&gt;Transform your plain text into static websites and blogs.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;welcome&quot;&gt;Welcome&lt;/h1&gt;
-
-&lt;h2 id=&quot;welcome-1&quot;&gt;Welcome&lt;/h2&gt;
-
-&lt;h3 id=&quot;welcome-2&quot;&gt;Welcome&lt;/h3&gt;
-
-&lt;p&gt;This site aims to be a comprehensive guide to Jekyll. We’ll cover topics such as getting your site up and running, creating and managing your content, customizing the way your site works and looks, deploying to various environments, and give you some advice on participating in the future development of Jekyll itself.&lt;/p&gt;
-
-&lt;h3 id=&quot;so-what-is-jekyll-exactlypermalink&quot;&gt;So what is Jekyll, exactly?Permalink&lt;/h3&gt;
-
-&lt;p&gt;Jekyll is a simple, blog-aware, static site generator. It takes a template directory containing raw text files in various formats, runs it through a converter (like &lt;a href=&quot;https://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;) and our &lt;a href=&quot;https://github.com/Shopify/liquid/wiki&quot;&gt;Liquid&lt;/a&gt; renderer, and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. Jekyll also happens to be the engine behind GitHub Pages, which means you can use Jekyll to host your project’s page, blog, or website from GitHub’s servers for free.&lt;/p&gt;
-
-&lt;h3 id=&quot;helpful-hintspermalink&quot;&gt;Helpful HintsPermalink&lt;/h3&gt;
-
-&lt;p&gt;Throughout this guide there are a number of small-but-handy pieces of information that can make using Jekyll easier, more interesting, and less hazardous. Here’s what to look out for.&lt;/p&gt;
-
-&lt;h3 id=&quot;video-test&quot;&gt;Video Test&lt;/h3&gt;
-
-&lt;iframe type=&quot;text/html&quot; width=&quot;100%&quot; height=&quot;385&quot; src=&quot;http://www.youtube.com/embed/gfmjMWjn-Xg&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</content><author><name>James</name></author><category term="test" /><summary type="html">Transform your plain text into static websites and blogs. Welcome Welcome Welcome This site aims to be a comprehensive guide to Jekyll. We’ll cover topics such as getting your site up and running, creating and managing your content, customizing the way your site works and looks, deploying to various environments, and give you some advice on participating in the future development of Jekyll itself. So what is Jekyll, exactly?Permalink Jekyll is a simple, blog-aware, static site generator. It takes a template directory containing raw text files in various formats, runs it through a converter (like Markdown) and our Liquid renderer, and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. Jekyll also happens to be the engine behind GitHub Pages, which means you can use Jekyll to host your project’s page, blog, or website from GitHub’s servers for free. Helpful HintsPermalink Throughout this guide there are a number of small-but-handy pieces of information that can make using Jekyll easier, more interesting, and less hazardous. Here’s what to look out for. Video Test</summary></entry><entry><title type="html">LOAM论文研读</title><link href="http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html" rel="alternate" type="text/html" title="LOAM论文研读" /><published>2019-07-25T00:00:00+08:00</published><updated>2019-07-25T00:00:00+08:00</updated><id>http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB</id><content type="html" xml:base="http://localhost:4000/2019/07/25/LOAM%E8%AE%BA%E6%96%87%E7%A0%94%E8%AF%BB.html">&lt;h1 id=&quot;loam论文研读&quot;&gt;LOAM论文研读&lt;/h1&gt;
-
-&lt;p&gt;​		下面让我们从3D激光SLAM的常用算法LOAM来入手，从提出这个算法的论文开始逐步剖析，了解3D激光SLAM面临的困难及解决方案。&lt;/p&gt;
-&lt;h2 id=&quot;摘要&quot;&gt;摘要&lt;/h2&gt;
-&lt;p&gt;​		首先在提出LOAM算法的论文（Low-drift and Real-time Lidar Odom and Mapping）中，作者提出了一种仅使用在六自由度环境下移动的3D激光雷达获取到的数据进行实时、低漂移的里程计和建图算法。实际上，这个问题并没有描述中的那么简单，由于激光雷达这个传感器结构的特殊性，其数据是在不同时刻采集到的，因此会导致点云数据的错误配准进而影响建图。为了解决这些问题，大多数3D激光SLAM算法都会进行回环检测来减少传感器带来的累计漂移，但是在LOAM中并没有回环检测这一手段，而是将SLAM问题拆分为两个子算法：里程计和建图。前者以较高的频率但是较低的精度实现对激光雷达的速度估计，而后者则以较前一个算法的频率低一个数量级的频率对激光雷达的数据进行匹配和点云的配准，通过这两个算法的结合就能实现实时建图的任务。算法的流程图如下所示：&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/算法流程图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图1  LOAM算法流程图 &lt;/div&gt;
-&lt;h2 id=&quot;符号说明&quot;&gt;符号说明&lt;/h2&gt;
-
-&lt;p&gt;​		接下来将会出现一系列的公式和符号，为了不产生混淆我们先在此进行介绍，之后的讲解中如有不理解的仍然会停下来进行说明，不过为了能够更快的继续我的们的课程，提前进行符号说明是必须的：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;$P^{k}$：表示在第$k$次扫描时获取到的点云数据&lt;/p&gt;
-
-  &lt;p&gt;$X_{k,i}^{L}$：表示在第$k$次扫描时，在激光雷达坐标系{$L$}下的一个点$i$&lt;/p&gt;
-
-  &lt;p&gt;$X_{k,i}^{W}$：表示在第$k$次扫描时，在世界坐标系{$W$}下的一个点$i$&lt;/p&gt;
-
-  &lt;p&gt;$T_{k}^{L}(t)$：表示在时刻$t$将一个点映射到第k次扫描起始时的坐标系下的变换（由于运动畸变）&lt;/p&gt;
-
-  &lt;p&gt;$T_{k}^{W}(t)$：表示在时刻$t$将一个点映射到世界坐标系下的变换&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;激光里程计&quot;&gt;激光里程计&lt;/h2&gt;
-
-&lt;h3 id=&quot;特征点选取&quot;&gt;特征点选取&lt;/h3&gt;
-
-&lt;p&gt;​		和许多SLAM算法一样，LOAM算法也使用特征点来计算坐标变换矩阵，因此我们的第一步便是从激光雷达获取到的点云中提取特征点，在LOAM中将特征点分为了两类：边缘点(Edge points)和平面点(Planar Points)。下面我们将会介绍如何在点云中提取这两类特征点。&lt;/p&gt;
-
-&lt;p&gt;​		提取特征点的依据是这个点的曲率，选取在点云$P_{k}$中的点$i$，设集合$S$为与点$i$相邻的点的集合，那么点$i$处的曲率可以由下式得到：
-&lt;script type=&quot;math/tex&quot;&gt;c=\frac{1}{|S|\cdot||X_{(k,i)}^{L}||}||\sum_{j\in S,j\ne i}(X_{(k,i)}^{L}-X_{(k,j)}^{L})||&lt;/script&gt;
-​		在实际应用中我们通常使用点$i$周围几个点来计算该点的曲率，得到了曲率后我们根据$c$值对各点进行排序，其中$c$值最大的被选为边缘点而最小的被选为平面点。在论文中，作者为了让特征点能够在全空间内分布的更加均匀，将每一次扫描分为四个子区域，每一个子区域最多可以提供2个边缘特征点和4个平面特征点，而且均需要和阈值$5\times10^{-3}$进行比较才能确定是否为特征点。&lt;/p&gt;
-
-&lt;p&gt;​		除此之外，由于传感器的数据不可能是完全精确的而且现实的环境又是多种多样极其复杂的，在选取特征点的时候需要避开可能造成错误的特征点，在LOAM中就对特征点的选取给出了限制：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;特征点的数量不应该超过子区域对特征点数量的限制&lt;/p&gt;
-
-  &lt;p&gt;应避免在已经被选择的点周围再次选择特征点&lt;/p&gt;
-
-  &lt;p&gt;特征点不应该选取在和雷达平面的夹角在$10^{\circ}$以内平面上&lt;/p&gt;
-
-  &lt;p&gt;特征点不应该选取在被遮挡的平面上&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;​		最主要的也最值得解释的是后两点限制，这两种情况的示意图如下图所示：&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/特征点选取示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图2 特征点选取示意图 &lt;/div&gt;
-&lt;p&gt;​		在第一种情况下，需要通过$S$中的点构成的平面来计算和激光雷达平面的角度；而在第二种情况下，则需要对点$i$附近的点中是否存在与其相隔很远的点来进行检查，如果存在这样的点则说明点$i$是在被遮挡着的平面上（即上图中的C、D点），特征点提取的结果如图下所示，其中黄色的点表示边缘点而红色则表示平面点。&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/特征点选取示意图2.png&quot; width=&quot;50%&quot; height=&quot;50%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图3 特征点选取结果示意图 &lt;/div&gt;
-&lt;h3 id=&quot;特征点匹配&quot;&gt;特征点匹配&lt;/h3&gt;
-
-&lt;p&gt;​		里程计算法用于估计激光雷达在一次扫描中的运动，我们设$t_{k}$为第$k$次扫描的起始时间，在第$k-1$次扫描的最后时刻将这一次扫描中采集到的点云数据映射到时间戳$t_{k}$上，这些被映射过的点云被记做$\bar P_{k-1}$，在第k次扫描中这部分数据和在第$k$次扫描时逐渐采集到的点云数据$P_{k}$一起估计激光雷达的运动。&lt;/p&gt;
-
-&lt;p&gt;​		在这一部分中我们不考虑如何对点云进行映射，我们将在下一部分介绍如何得到所需的变换阵。我们设在点云集合$P_{k}$中边缘特征点的集合为$\varepsilon_{k}$，平面特征点的集合为$H_{k}$，我们接下来就需要在$\bar P_{k-1}$中寻找和这两个集合中元素匹配的点。需要注意的是在第$k$次扫描刚开始时，上述的集合都还是空集合，随着扫描时间的增加特征点的数量逐渐增加，因此我们需要将特征点映射到第$k$次扫描的起始时刻$t_{k}$，设映射后的点集为$\tilde\varepsilon_{k}$和$\tilde H_{k}$。对于映射后的集合中的每一个元素，在$\bar P_{k-1}$中寻找最近邻的点，其中$\bar P_{k-1}$是通过$KD-tree$进行储存的。&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;首先介绍边缘特征点如何进行匹配。对于在集合$\tilde\varepsilon_{k}$中的边缘特征点$i$首先在$\bar P_{k-1}$中寻找它的最近邻点$j$，之后在这个近邻点$j$所在的扫描面的前后两个扫描面上寻找与$i$最近邻的点$l$。那么边缘特征点的匹配就可以使用元组$(j,l)$来进行表示，但是这两个点都需要满足$c &amp;gt; 5\times10^{-3}$的条件。&lt;/li&gt;
-  &lt;li&gt;接下来介绍平面特征点如何进行匹配。对于在集合$\tilde H_{k}$中的平面特征点$i$首先在$\bar{P}_{k-1}$中寻找它的最近邻点$j$，之后再寻找两个近邻点用来表示平面特征点的匹配，这两个点的其中一个是在这个近邻点$j$所在的扫描面选择的除点$j$之外的另一个近邻点，另一个是在其前后两个扫描面上选择的一个近邻点。那么平面特征点的匹配就可以使用元组$(j,l,m)$来进行表示。之所以这样选取是为了保证这三个一定是不共线的，当然和边缘特征点匹配中一样，同样需要保证这三个点满足$c &amp;lt; 5\times10^{-3}$的条件。特征点匹配的示意图如下所示：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/特征点匹配示意图.png&quot; width=&quot;75%&quot; height=&quot;75%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图4 特征点匹配示意图 &lt;/div&gt;
-&lt;p&gt;​		获得了匹配好的特征点后，我们可以通过特征点和与其匹配的边缘或平面之间的距离来对变换矩阵进行优化，具体的计算方式如下所示：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;边缘特征点和对应边缘之间的距离可以通过外积来求得。下式中的分子部分表示的是由$\vec{ij}$和$\vec{il}$为边组成的平行四边形的面积，而分子则表示$\vec{jl}$的长度，最终的结果便是点$i$到点$j$和$l$表示的边缘的距离：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;d\varepsilon=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\times(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,l)}^{L})|}{|\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L}|}&lt;/script&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;平面特征点和对应平面之间的距离可以通过混合积来求得。下式中的分子部分表示的是由$\vec{jm}$、$\vec{jl}$和$\vec{ji}$为边组成的平行六面体的体积，而分子则表示底面的面积，最终的结果便是点$i$到底面的距离：&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;d_{H}=\frac{|(\tilde X_{(k,i)}^{L}-\bar X_{(k-1,j)}^{L})\cdot((\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L}))|}{|(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,l)}^{L})\times(\bar X_{(k-1,j)}^{L}-\bar X_{(k-1,m)}^{L})|}&lt;/script&gt;
-
-&lt;p&gt;​		注意其中$X$上边符号的不同，$\tilde{}$表示的是在$\tilde{P_{k}}$中获得到的特征点，而$\bar{}$则表示的是在$\bar{P}_{k-1}$中获得到的前一次扫描中的特征点。&lt;/p&gt;
-
-&lt;h3 id=&quot;动作估计&quot;&gt;动作估计&lt;/h3&gt;
-
-&lt;p&gt;​		在这一部分中我们就开始介绍之前没有进行的动作估计，也就是获得在第$k$次扫描时的变换矩阵，这个变换矩阵是一个随时间发生变化的矩阵$T_{k}^{L}(t)$。这个变换矩阵表征了六个自由度上的变化，可以被拆分成两个部分，分别是旋转变换和平移变换：$T_{k}^{L}(t)=[\tau_{k}^{L}(t)$,$\theta_{k}^{L}(t)]^{T}$，其中$\tau_{k}^{L}(t)=[t_x,t_y,t_z]^{T}$，$\theta_{k}^{L}(t)=[\theta_x,\theta_y,\theta_z]^T$。可以使用罗德里格斯公式来计算对应的旋转矩阵：&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;R_{k}^{L}(t)=e^{\hat{\theta}_{k}^{L}(t)}=I+\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||}sin||\theta_{k}^{L}(t)||+(\frac{\hat{\theta}_{k}^{L}(t)}{||\theta_{k}^{L}(t)||})^2(1-||cos\theta_{k}^{L}(t)||)&lt;/script&gt;
-
-&lt;p&gt;​		其中$\hat \theta_{k}^{L}(t)$表示$\theta_{k}^{L}(t)$的反对称矩阵，如果不清楚可以稍后随意查一下就行，或者只需要知道这是一个由$\theta_{k}^{L}(t)$中的元素组成的矩阵即可。得到了旋转矩阵后便可以使用获取到的点云数据将其映射回当前扫描的起始时刻$t_{k}$：&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\tilde{X}_{(k,i)}^{L}=R_{(k,i)}^{L}X_{(k,i)}^{L}+\tau_{(k,i)}^{L}&lt;/script&gt;
-
-&lt;p&gt;​		不知道大家还记不记得之前计算特征点和边缘与平面之间距离的公式，将上式与那两个公式联系起来便能简化成以下形式：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;$f_{\varepsilon}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d\varepsilon,　i\in\varepsilon_{k}$&lt;/li&gt;
-  &lt;li&gt;$f_{H}(X_{(k,i)}^{L}(t),T_{k}^{L}(t))=d_{H},　i\in H_{k}$&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;​		将上式进行统一即可得到以下的公式，我们可以使用列文伯格-马夸尔特优化算法不断地进行优化直至收敛或达到预设的迭代次数，进而得到期望的变换矩阵$T_{k}^{L}(t)$：&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(T_{k}^{L}(t))=d&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;T_k^L(t)\leftarrow T_k^L(t)-(J^TJ+\lambda diag(J^TJ))^{-1}J^Td&lt;/script&gt;
-
-&lt;p&gt;​		其中$J$为$f$对$T_k^L(t)$计算得到的$Jacobian$矩阵，$\lambda$是由列文伯格-马夸尔特算法决定的因子。&lt;/p&gt;
-
-&lt;h3 id=&quot;激光里程计的整体算法&quot;&gt;激光里程计的整体算法&lt;/h3&gt;
-
-&lt;p&gt;​		下面是我们刚才叙述的激光里程计算法的汇总，可以看到在第$k$次扫描时的输入为上一次扫描获得的点云映射在$t_k$时刻之后的结果，当前扫描获取到的点云信息和初始变换矩阵。按照刚刚讲解的顺序，先是从点云数据中提取了边缘特征点和平面特征点，之后又使用非线性优化方法对变换矩阵进行计算，当结束本次扫描后再将本次扫描获取到的点云数据使用上一步中计算得到的变换矩阵将点云数据映射到$t_{k+1}$时刻上，最后结束本次扫描并返回变换矩阵。&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/激光里程计算法.png&quot; width=&quot;65%&quot; height=&quot;65%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图5 激光里程计算法 &lt;/div&gt;
-&lt;h2 id=&quot;激光建图&quot;&gt;激光建图&lt;/h2&gt;
-
-&lt;p&gt;​		激光建图的整个流程和激光里程计实质上并没有什么差别，只不过我们需要进行匹配的点云是地图点云$Q_{k-1}$而已。在下图中黑色部分的是已经建好的地图中的点云，绿色部分是我们在第$k$次扫描时获取到的点云数据映射到世界坐标系${W}$下的结果，蓝色的轨迹线是在第$k$次扫描以前激光雷达的运动轨迹，而橙色的轨迹线则表示在第$k$次扫描时激光雷达运动的轨迹。&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-  &lt;img src=&quot;../25/建图示意图.png&quot; width=&quot;65%&quot; height=&quot;65%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div align=&quot;center&quot;&gt; 图6 建图示意图 &lt;/div&gt;
-&lt;p&gt;​		在建图中，由于采用更低的频率，我们也可以选择更多的特征点数，在论文中作者选择了十倍于里程计算法的特征点数，但是选择特征点的方式和依据没有改变。在建图中我们需要通过优化算法计算的主要是将激光雷达位姿映射到世界坐标系的变换$T_k^W(t)$，将之前用于优化的公式中的所有$T_k^L(t)$替换为$T_k^W(t)$并把在$P_k$中出现的点替换为在$Q_{k}$中出现的点即可：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;$f_{\varepsilon}(Q_{(k,i)}(t),T_{k}^{W}(t))=d\varepsilon,　i\in\varepsilon_{k}$&lt;/li&gt;
-  &lt;li&gt;$f_{H}(Q_{(k,i)}(t),T_{k}^{L}(t))=d_{H},　i\in H_{k}$&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;​		之后仍然是使用列文伯格-马夸尔特算法进行优化实现建图操作，至此我们的论文解析就结束了，在LOAM中仅使用了激光雷达的点云数据，通过两个子算法激光里程计和激光建图实现了低漂移的3D激光SLAM。&lt;/p&gt;</content><author><name>James</name></author><category term="3D_SLAM" /><summary type="html">LOAM论文研读</summary></entry></feed>
+&lt;p&gt;​		&lt;code class=&quot;highlighter-rouge&quot;&gt;optimizer.zero_grad()&lt;/code&gt;这一步至关重要！一定不要忘记！&lt;/p&gt;</content><author><name>James</name></author><category term="PyTorch" /><summary type="html">PyTorch</summary></entry></feed>

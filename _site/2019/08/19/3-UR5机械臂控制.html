@@ -1,0 +1,453 @@
+<!-- 博文的布局-Layout -->
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 引入head标签 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-sclable=0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="这是一个初学博客的博主" />
+<meta name="keywords" content="Robot, Artificial Intelligent, Diary" />
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/media.css">
+<link rel="stylesheet" href="/assets/css/animate.min.css">
+<link rel="stylesheet" href="/assets/css/pygments/pygments_default.css">
+<link rel="stylesheet" href="/assets/css/github-markdown.css">
+<!-- SNS-icon -->
+<script src="//at.alicdn.com/t/font_856428_y9z6nq7zf5.js"></script>
+<!-- share.css -->
+<link rel="stylesheet" href="/assets/css/share.min.css">
+<!-- font -->
+<link rel="stylesheet" href="/assets/css/font.css">
+<link rel="dns-prefetch" href="//cdn.bootcss.com" />
+<!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
+
+<!-- Favicon -->
+<link href="/assets/profile.jpeg" rel="shortcut icon" />
+<link href="/assets/profile.jpeg" rel="apple-touch-icon-precomposed" />
+<!-- Android Lolipop Theme Color -->
+<!-- <meta name="theme-color" content="#1464FB"> -->
+<title>3 UR5机械臂控制</title>
+<!-- 百度统计 -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<!-- 谷歌分析 -->
+
+<script type="text/x-mathjax-config">
+var mathId = document.getElementById("post-content"); //选择公式识别范围
+MathJax.Hub.Config({
+    showProcessingMessages: false, //关闭js加载过程信息
+    messageStyle: "none", //不显示信息
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath:  [ ["$", "$"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"] ], //段内公式选择$$
+    },
+    "HTML-CSS": {
+        availableFonts: ["STIX","TeX"], //可选字体
+        showMathMenu: true //关闭右击菜单显示
+    }
+});
+MathJax.Hub.Queue(["Typeset",MathJax.Hub,mathId]);
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<!-- Android Lolipop Theme Color -->
+<meta name="theme-color" content=" rgb(255,210,32) ">
+</head>
+<body>
+
+<!-- 顶部锚点 -->
+<a id="htmlup" name="htmlup"></a>
+<!-- 引入博文顶部选项 -->
+
+<header id="post-header" style="background-color:rgb(255,210,32);">
+  <div class="top-center">
+      <div class="logo">
+          <a href="/" title="my awesome webtitle" style="color: white;">James' HomePage</a>
+      </div>
+      <nav class="top-nav">
+          <ul>
+              
+                <li><a href="/" style="color: white;">首页</a></li>
+              
+                <li><a href="/tags.html" style="color: white;">标签</a></li>
+              
+                <li><a href="/timeline.html" style="color: white;">时间线</a></li>
+              
+                <li><a href="/about.html" style="color: white;">关于博主</a></li>
+              
+                <li><a href="/friendLink.html" style="color: white;">友情链接</a></li>
+              
+          </ul>
+      </nav>
+      <div id="top-boot">
+        <a href="javascript:;" id="boot1" style="display:block;" onclick="document.getElementById('boot-area').style.display='block';document.getElementById('boot1').style.display='none';document.getElementById('boot2').style.display='block';"><img src="/assets/boot_white.png" alt=""></a>
+        <a href="javascript:;" id="boot2" style="display: none;" onclick="document.getElementById('boot-area').style.display='none';document.getElementById('boot1').style.display='block';document.getElementById('boot2').style.display='none';"><img src="/assets/boot_white.png" alt=""></a>
+      </div>
+  </div>
+
+</header>
+
+
+<!-- 引入移动下拉选项 -->
+<div id="boot-area">
+    <ul>
+        
+          <a href="/"><li>首页</li></a>
+        
+          <a href="/tags.html"><li>标签</li></a>
+        
+          <a href="/timeline.html"><li>时间线</li></a>
+        
+          <a href="/about.html"><li>关于博主</li></a>
+        
+          <a href="/friendLink.html"><li>友情链接</li></a>
+        
+    </ul>
+</div>
+
+<!-- 引入博文顶部样式 -->
+<!-- 版本一 垃圾 -->
+<!-- <div class="wow fadeIn top" data-wow-duration="3.5s" >
+    <span class="wow fadeInUp" data-wow-delay="0.2s">3 UR5机械臂控制</span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span>
+</div> -->
+
+<!-- 版本二 可切换页面 -->
+
+<div class="post-top" style="background-color:rgb(255,210,32);">
+  <!-- 页面宽度大于800px -->
+  <div class="left-area">
+    
+      <a href="javascript:;" class="btn bounceInLeft animated" onmouseover="showLeft();this.style.color='rgb(255,210,32)';" onmouseout="goneLeft();this.style.color='rgba(0,0,0,.2)';"><</a>
+      <div id="left-tab" style="display:none;"><span class="left-san"></span><span class="left-main" style="color:rgb(255,210,32);"><sapn class="main">没有上一页咯</sapn></span></div>
+    
+  </div>
+  <div class="post-titlearea">
+    <span class="wow fadeInUp" data-wow-delay="0.2s">3 UR5机械臂控制</span>
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span> -->
+  </div>
+  <div class="right-area">
+    
+      <a href="/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html" class="btn bounceInRight self-animated" onmouseover="showRight();this.style.color='rgb(255,210,32)';" onmouseout="goneRight();this.style.color='rgba(0,0,0,.2)';">></a>
+      <div id="right-tab" style="display:none;"><span class="right-san"></span><span class="right-main" style="color:rgb(255,210,32);"><sapn class="main">2 OpenCV颜色识别</sapn></span></div>
+    
+  </div>
+
+  <!-- 页面宽度小于800px -->
+  <div class="post-changearea">
+    
+      <a href="javascript:;" class="leftchange" style="border-right: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span><br>没有上一篇咯</span></a>
+    
+    
+      <a href="/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html" class="rightchange" style="border-left: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>下一篇<br><br>2 OpenCV颜色识别</span></a>
+    
+  </div>
+</div>
+
+
+<div class="markdown-body fadeInUp animated">
+
+  
+
+  <!-- 文章内容 -->
+  <h1 id="ur5机械臂控制">UR5机械臂控制</h1>
+
+<p>  在本小节中将会使用moveit!在Python的api进行编程，实现从颜色识别模块中获得目标位姿信息，进而控制机械臂到达目标位姿。为此，在程序中需要有这样几个部分：</p>
+
+<ul>
+  <li>接收位姿信息的订阅器及其回调函数</li>
+  <li>在moveit!的规划场景中增加障碍物的函数</li>
+  <li>实现机械臂控制的函数</li>
+</ul>
+
+<p>  第一部分十分简单，我们将在最后进行介绍，接下来让我们学习其他部分程序的编写。首先import我们需要的头文件，其中moveit_commander就是在Python中进行moveit!编程最重要的api了：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+</span>
+<span class="kn">import</span> <span class="nn">moveit_commander</span>
+<span class="kn">import</span> <span class="nn">rospy</span><span class="p">,</span> <span class="n">sys</span>
+<span class="kn">import</span> <span class="nn">moveit_msgs.msg</span>
+<span class="kn">import</span> <span class="nn">geometry_msgs.msg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+
+<p>  声明一个名为Grasping的类，在它的初始化函数中需要初始化一个名为ur5_grasping的节点；之后创建的是规划场景的一个实例，其后的休眠<code class="highlighter-rouge">rospy.sleep(1)</code>一定不能丢掉！初始化需要一定时间，否则将不能成功的添加障碍物；接着就是创建了move_group的一个实例，紧接着需要设置他的一些参数，其中最主要的是后两个参数，将replanning设置为True可以允许moveit!在轨迹规划失败时进行重规划，减少程序报错失效的可能；最后一步则是在规划场景中添加障碍物，如果成功则会在终端中显示<code class="highlighter-rouge">OK!</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Grasping</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">moveit_commander</span><span class="o">.</span><span class="n">roscpp_initialize</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s">'ur5_grasping'</span><span class="p">,</span> <span class="n">anonymous</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">moveit_commander</span><span class="o">.</span><span class="n">PlanningSceneInterface</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_name</span> <span class="o">=</span> <span class="s">""</span>
+        
+        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span> <span class="o">=</span> <span class="n">moveit_commander</span><span class="o">.</span><span class="n">MoveGroupCommander</span><span class="p">(</span><span class="s">'manipulator'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span><span class="o">.</span><span class="n">set_goal_joint_tolerance</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span><span class="o">.</span><span class="n">set_max_acceleration_scaling_factor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span><span class="o">.</span><span class="n">set_max_velocity_scaling_factor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span><span class="o">.</span><span class="n">allow_replanning</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span><span class="o">.</span><span class="n">set_planning_time</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_box</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'OK!'</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'Failed!'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>  那么接下来就让我们看看是如何在规划场景中添加障碍物的。首先介绍一下这个障碍物，在没有添加障碍的情况下，机械臂的轨迹规划是完全自由的，为了实现一个简单的移动，轨迹规划的结果甚至有可能绕一个巨大的圈来实现你的目标，在这样的过程中就有可能与环境中的其他物体比如地面等发生碰撞。在这种情况下我们就需要在moveit!的规划场景中添加合适的障碍物，在进行轨迹规划的时候也会选择一条合适的轨迹以保证机械臂不会与环境中的物体发生碰撞。</p>
+
+<p>  在moveit!的官方文档中有一个十分复杂的例程，我们选取其中需要的部分来实现我们的功能，更加深入的内容可以前往官网进行学习：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://docs.ros.org/kinetic/api/moveit_tutorials/html/
+</code></pre></div></div>
+
+<p>  我们从例程中选择两个函数，其中一个函数是<code class="highlighter-rouge">is_ok</code>。它是用来检测对场景的改变，比如添加物体或者让物体附着于某一关节的操作是否完成，在原例程中还有一个将物体附着与其他关节的函数，<code class="highlighter-rouge">is_ok</code>通过传入的参数巧妙地同时完成了这一任务：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">is_ok</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box_is_known</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">box_is_attached</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+    <span class="n">seconds</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+    <span class="n">box_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">box_name</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">seconds</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+        <span class="c1"># Test if the box is in attached objects
+</span>        <span class="n">attached_objects</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">get_attached_objects</span><span class="p">([</span><span class="n">box_name</span><span class="p">])</span>
+        <span class="n">is_attached</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">attached_objects</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="c1"># Test if the box is in the scene.
+</span>        <span class="c1"># Note that attaching the box will remove it from known_objects
+</span>        <span class="n">is_known</span> <span class="o">=</span> <span class="n">box_name</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">get_known_object_names</span><span class="p">()</span>
+
+        <span class="c1"># Test if we are in the expected state
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">box_is_attached</span> <span class="o">==</span> <span class="n">is_attached</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">box_is_known</span> <span class="o">==</span> <span class="n">is_known</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="c1"># Sleep so that we give other threads time on the processor
+</span>        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">seconds</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+</code></pre></div></div>
+
+<p>  而另一函数则是<code class="highlighter-rouge">add_box</code>，顾名思义他是用来在规划场景中添加物体的函数，首先它使用geometry_msg中的PoseStamped设置了盒子的位姿，并将它命名为<code class="highlighter-rouge">table</code>用来表示我们在Gazebo仿真模型中添加的桌子。仅仅添加桌子这一个障碍物是不够的，因为在规划中仍然可能会规划出错误的轨迹，导致机械臂和地面发生碰撞，因此还需要添加一个地面障碍物，方法步骤都和添加桌子是一样的。最终函数的返回值则是is_ok判断的结果，在调用时根据返回值便可以知道是否成功添加障碍物：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">add_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">box_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">box_name</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span>
+
+    <span class="c1"># Add table
+</span>    <span class="n">box_pose</span> <span class="o">=</span> <span class="n">geometry_msgs</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">PoseStamped</span><span class="p">()</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="s">"base_link"</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">box_name</span> <span class="o">=</span> <span class="s">"table"</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">box_name</span><span class="p">,</span> <span class="n">box_pose</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">))</span>
+
+    <span class="c1"># Add floor
+</span>    <span class="n">box_pose</span> <span class="o">=</span> <span class="n">geometry_msgs</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">PoseStamped</span><span class="p">()</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="s">"base_link"</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">box_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">box_name</span> <span class="o">=</span> <span class="s">"floor"</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">box_name</span><span class="p">,</span> <span class="n">box_pose</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">box_name</span><span class="o">=</span><span class="n">box_name</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ok</span><span class="p">(</span><span class="n">box_is_known</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>  需要强调的是，这里的添加障碍物并不是真的在环境中放置了一个物体，执行完这些命令后你不会在Gazebo中发现任何的改变，但是在RViz界面中你将会看到刚刚被添加进来的桌子和地面，它起到的作用仅仅是用于moveit!在进行轨迹规划时能够避开真实环境或仿真中的物体，因此通常都将这里的障碍物设置的和真实或仿真环境中的障碍物大小一样。</p>
+
+<p>  在添加完障碍物后，我们就可以编写进行机械臂控制的函数了，在这里我们将实现两个功能：将机械臂归位和控制机械臂到达目标位姿。首先是让机械臂归位，在归位函数中使用之前初始化好的move_group实例对机械臂进行控制，设定目标姿态为之前预设的<code class="highlighter-rouge">home</code>姿态，之后使用<code class="highlighter-rouge">move_group.go()</code>来执行规划，之后休眠一段时间等待机械臂达成目标：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">homing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">move_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span>
+    <span class="n">move_group</span><span class="o">.</span><span class="n">set_named_target</span><span class="p">(</span><span class="s">'home'</span><span class="p">)</span>
+    <span class="n">move_group</span><span class="o">.</span><span class="n">go</span><span class="p">()</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>  其次是控制机械臂到达目标位姿，首先使用move_group设定当前的机器人位姿作为起始状态，之后通过函数参数传递进来的目标位姿设定机械臂的目标位姿，接下来就是执行规划的轨迹、清楚目标位姿等后续操作：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">def</span> <span class="nf">move_to_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose_goal</span><span class="p">):</span>
+        <span class="n">move_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_group</span>
+        
+        <span class="n">move_group</span><span class="o">.</span><span class="n">set_start_state_to_current_state</span><span class="p">()</span>
+        <span class="n">move_group</span><span class="o">.</span><span class="n">set_pose_target</span><span class="p">(</span><span class="n">pose_goal</span><span class="p">)</span>
+        
+        <span class="n">plan</span> <span class="o">=</span> <span class="n">move_group</span><span class="o">.</span><span class="n">go</span><span class="p">()</span>        
+        <span class="n">move_group</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="n">move_group</span><span class="o">.</span><span class="n">clear_pose_targets</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>  而在程序中实例化我们刚刚创建的类时，仅仅这些是不够的，因为我们还没有从上一个模块中获取目标位姿，因此需要创建一个接收器用来接收目标位姿的消息，与此同时还要声明一个全局变量用来从回调函数中获取目标位姿：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">goal</span>
+    <span class="n">goal</span> <span class="o">=</span> <span class="n">data</span>
+        
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    
+    <span class="n">location_sub</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="s">'/recognition/location'</span><span class="p">,</span> <span class="n">geometry_msgs</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">Pose</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+    
+    <span class="n">demo</span> <span class="o">=</span> <span class="n">Grasping</span><span class="p">()</span>
+    <span class="n">demo</span><span class="o">.</span><span class="n">homing</span><span class="p">()</span>
+    
+    <span class="n">demo</span><span class="o">.</span><span class="n">move_to_goal</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>  至此我们的任务就全部完成了！现在就让我们试验一下吧，首先需要启动实验环境的仿真程序，接下来打开颜色识别的程序，然后可以使用<code class="highlighter-rouge">rostopic echo</code>检查消息的内容来判断程序是否运行正常，最后就是打开抓取的程序完成我们的任务了！</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch ur5_grasping ur5_grasping.launch
+rosrun ur5_grasping recognition.py
+rosrun ur5_grasping ur5_grasping.py
+</code></pre></div></div>
+
+<div align="center">
+  <img src="../19/RViz最终结果.png" width="45%" height="45%" />
+  <img src="../19/Gazebo最终结果.png" width="45%" height="45%" />
+</div>
+
+
+  <!-- 引入share模块 -->
+  
+  <div class="social-share-wrapper">
+    <div class="social-share"></div>
+  </div>
+
+
+<!-- share.js -->
+<script src="/assets/js/social-share.min.js"></script>
+<script>
+  socialShare('.social-share', {
+    sites: [
+      
+        'qq'
+        ,
+        
+      
+        'wechat'
+        ,
+        
+      
+        'weibo'
+        ,
+        
+      
+        'twitter'
+        ,
+        
+      
+        'facebook'
+        
+      
+    ],
+    wechatQrcodeTitle: "分享到微信朋友圈",
+    wechatQrcodeHelper: '期待在朋友圈见到这篇文章'
+  });
+</script>
+
+</div>
+
+<!-- 底部锚点 -->
+<a id="htmldown" name="htmldown"></a>
+<!-- 引入评论模块 -->
+
+
+
+    <section class="post-footer-item comment">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDI2OS8xMDgwNg=="></div>
+    </section>
+
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+
+           if (typeof LivereTower === 'function') { return; }
+
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+    </script>
+    <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    <!-- City版安装代码已完成 -->
+
+
+
+
+
+<!-- 引入goto模块 -->
+<div class="bounceInRight animated go">
+  <a title="顶部切换页面" class="gototop" href="#htmlup" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Top
+    </div>
+  </a>
+  <a title="底部有livere评论哦" class="gotobottom" href="#htmldown" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Foot
+    </div>
+  </a>
+</div>
+
+<!-- 引入页面底部模块 -->
+<footer id="bottom">
+  <br>
+  <span>James' HomePage ©
+  
+  
+    2018
+    -
+  
+  2019
+  <br>
+  Powered by <a href="https://www.jekyll.com.cn/">Jekyll</a> | <a href="https://github.com/xukimseven/HardCandy-Jekyll">HardCandy-Jekyll</a></span>
+</footer>
+
+
+<!-- 引用wow.js的动画效果 -->
+<script src="/assets/js/wow.js"></script>
+<script>
+    var wow = new WOW({
+        boxClass: 'wow',
+        animateClass: 'animated',
+        // offset: 600,
+        mobile: true,
+        live: true
+    });
+    wow.init();
+</script>
+<!-- 页面刷新回到顶部 -->
+<script>
+    window.onbeforeunload = function(){
+        //刷新后页面自动回到顶部
+        document.documentElement.scrollTop = 0;  //ie下
+        document.body.scrollTop = 0;  //非ie
+    }
+</script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

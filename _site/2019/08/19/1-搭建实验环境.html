@@ -1,0 +1,434 @@
+<!-- 博文的布局-Layout -->
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 引入head标签 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-sclable=0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="这是一个初学博客的博主" />
+<meta name="keywords" content="Robot, Artificial Intelligent, Diary" />
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/media.css">
+<link rel="stylesheet" href="/assets/css/animate.min.css">
+<link rel="stylesheet" href="/assets/css/pygments/pygments_default.css">
+<link rel="stylesheet" href="/assets/css/github-markdown.css">
+<!-- SNS-icon -->
+<script src="//at.alicdn.com/t/font_856428_y9z6nq7zf5.js"></script>
+<!-- share.css -->
+<link rel="stylesheet" href="/assets/css/share.min.css">
+<!-- font -->
+<link rel="stylesheet" href="/assets/css/font.css">
+<link rel="dns-prefetch" href="//cdn.bootcss.com" />
+<!-- <link href="https://fonts.googleapis.com/css?family=Kaushan+Script|Pacifico|Ubuntu|Roboto+Mono|Source+Sans+Pro" rel="stylesheet"> -->
+
+<!-- Favicon -->
+<link href="/assets/profile.jpeg" rel="shortcut icon" />
+<link href="/assets/profile.jpeg" rel="apple-touch-icon-precomposed" />
+<!-- Android Lolipop Theme Color -->
+<!-- <meta name="theme-color" content="#1464FB"> -->
+<title>1 搭建实验环境</title>
+<!-- 百度统计 -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<!-- 谷歌分析 -->
+
+<script type="text/x-mathjax-config">
+var mathId = document.getElementById("post-content"); //选择公式识别范围
+MathJax.Hub.Config({
+    showProcessingMessages: false, //关闭js加载过程信息
+    messageStyle: "none", //不显示信息
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath:  [ ["$", "$"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"] ], //段内公式选择$$
+    },
+    "HTML-CSS": {
+        availableFonts: ["STIX","TeX"], //可选字体
+        showMathMenu: true //关闭右击菜单显示
+    }
+});
+MathJax.Hub.Queue(["Typeset",MathJax.Hub,mathId]);
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<!-- Android Lolipop Theme Color -->
+<meta name="theme-color" content=" rgb(255,210,32) ">
+</head>
+<body>
+
+<!-- 顶部锚点 -->
+<a id="htmlup" name="htmlup"></a>
+<!-- 引入博文顶部选项 -->
+
+<header id="post-header" style="background-color:rgb(255,210,32);">
+  <div class="top-center">
+      <div class="logo">
+          <a href="/" title="my awesome webtitle" style="color: white;">James' HomePage</a>
+      </div>
+      <nav class="top-nav">
+          <ul>
+              
+                <li><a href="/" style="color: white;">首页</a></li>
+              
+                <li><a href="/tags.html" style="color: white;">标签</a></li>
+              
+                <li><a href="/timeline.html" style="color: white;">时间线</a></li>
+              
+                <li><a href="/about.html" style="color: white;">关于博主</a></li>
+              
+                <li><a href="/friendLink.html" style="color: white;">友情链接</a></li>
+              
+          </ul>
+      </nav>
+      <div id="top-boot">
+        <a href="javascript:;" id="boot1" style="display:block;" onclick="document.getElementById('boot-area').style.display='block';document.getElementById('boot1').style.display='none';document.getElementById('boot2').style.display='block';"><img src="/assets/boot_white.png" alt=""></a>
+        <a href="javascript:;" id="boot2" style="display: none;" onclick="document.getElementById('boot-area').style.display='none';document.getElementById('boot1').style.display='block';document.getElementById('boot2').style.display='none';"><img src="/assets/boot_white.png" alt=""></a>
+      </div>
+  </div>
+
+</header>
+
+
+<!-- 引入移动下拉选项 -->
+<div id="boot-area">
+    <ul>
+        
+          <a href="/"><li>首页</li></a>
+        
+          <a href="/tags.html"><li>标签</li></a>
+        
+          <a href="/timeline.html"><li>时间线</li></a>
+        
+          <a href="/about.html"><li>关于博主</li></a>
+        
+          <a href="/friendLink.html"><li>友情链接</li></a>
+        
+    </ul>
+</div>
+
+<!-- 引入博文顶部样式 -->
+<!-- 版本一 垃圾 -->
+<!-- <div class="wow fadeIn top" data-wow-duration="3.5s" >
+    <span class="wow fadeInUp" data-wow-delay="0.2s">1 搭建实验环境</span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.4s"></span>
+    <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span>
+</div> -->
+
+<!-- 版本二 可切换页面 -->
+
+<div class="post-top" style="background-color:rgb(255,210,32);">
+  <!-- 页面宽度大于800px -->
+  <div class="left-area">
+    
+      <a href="/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html" class="btn bounceInLeft animated" onmouseover="showLeft();this.style.color='rgb(255,210,32)';" onmouseout="goneLeft();this.style.color='rgba(0,0,0,.2)';"><</a>
+      <div id="left-tab" style="display:none;"><span class="left-san"></span><span class="left-main" style="color:rgb(255,210,32);"><sapn class="main">2 OpenCV颜色识别</sapn></span></div>
+    
+  </div>
+  <div class="post-titlearea">
+    <span class="wow fadeInUp" data-wow-delay="0.2s">1 搭建实验环境</span>
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.4s"></span> -->
+    <!-- <span class="wow fadeInUp" data-wow-delay="0.6s">作者&nbsp;&nbsp;|&nbsp;&nbsp;James</span> -->
+  </div>
+  <div class="right-area">
+    
+      <a href="/2019/08/10/%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html" class="btn bounceInRight self-animated" onmouseover="showRight();this.style.color='rgb(255,210,32)';" onmouseout="goneRight();this.style.color='rgba(0,0,0,.2)';">></a>
+      <div id="right-tab" style="display:none;"><span class="right-san"></span><span class="right-main" style="color:rgb(255,210,32);"><sapn class="main">外参标定理论介绍</sapn></span></div>
+    
+  </div>
+
+  <!-- 页面宽度小于800px -->
+  <div class="post-changearea">
+    
+      <a href="/2019/08/19/2-OpenCv%E9%A2%9C%E8%89%B2%E8%AF%86%E5%88%AB.html" class="leftchange" style="border-right: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>上一篇<br><br>2 OpenCV颜色识别</span></a>
+    
+    
+      <a href="/2019/08/10/%E5%A4%96%E5%8F%82%E6%A0%87%E5%AE%9A%E7%90%86%E8%AE%BA%E4%BB%8B%E7%BB%8D.html" class="rightchange" style="border-left: 1px solid rgb(255,210,32);border-bottom: 2px solid rgb(255,210,32);"><span>下一篇<br><br>外参标定理论介绍</span></a>
+    
+  </div>
+</div>
+
+
+<div class="markdown-body fadeInUp animated">
+
+  
+
+  <!-- 文章内容 -->
+  <h1 id="搭建实验环境">搭建实验环境</h1>
+
+<p>  本章将会介绍如何对机械臂进行编程控制，实现的具体任务简单来说是控制机械臂的末端到达目标位姿。要实现这一目标我们需要完成以下几部分内容：</p>
+
+<ul>
+  <li>搭建实验所用到的环境</li>
+  <li>使用OpenCv + Python利用颜色识别获取目标位姿</li>
+  <li>使用moveit! + Python控制机械臂到达制定位姿</li>
+</ul>
+
+<p>  在本章中使用到的实验环境包括一个UR5机械臂的仿真模型，一个黑色的盒子作为桌子以及桌子上的一个绿色小方块，除此之外还需要一个相机作为传感器加入到Gazebo仿真模型中；在识别部分，使用OpenCv中的模块对相机获取到的图像进行处理，通过颜色设置合适的阈值获得方块的位置，进而通过发布节点发布机械臂的目标位姿；在机械臂控制部分中通过订阅节点获取识别模块提供的目标位姿，使用moveit!编程在moveit!的规划场景中添加障碍物并进行轨迹规划，最后执行规划以实现控制Gazebo仿真模型中的UR5机械臂。</p>
+
+<p>  在搭建实验环境这一步骤中总共分为三个部分：</p>
+
+<ul>
+  <li>下载并编译UR5机械臂的仿真模型</li>
+  <li>在Gazebo的世界模型中添加桌子及方块</li>
+  <li>在Gazebo中使用camera插件并进行调试</li>
+</ul>
+
+<h2 id="ur5机械臂模型">UR5机械臂模型</h2>
+
+<p>  首先是UR5的机械臂仿真模型，如果你已经看过了手眼标定的部分，那此时你的计算机上应该已经存在<code class="highlighter-rouge">universal_robot</code>这个文件夹了，如果没有则按照下面的程序进行下载并编译，具体过程不在这里重复叙述了：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install ros-kinetic-moveit
+sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+sudo apt-get install ros-kinetic-industrial-core
+
+cd ~/catkin_ws/src
+git clone https://github.com/ros-industrial/universal_robot.git
+
+cd ../
+rosdep install --from-paths src --ignore-src --rosdistro kinetic
+catkin_make
+</code></pre></div></div>
+
+<p>  完成之后将会在你的工作空间中出现一个<code class="highlighter-rouge">universal_robot</code>文件夹，这个文件夹内的<code class="highlighter-rouge">ur_description</code>、<code class="highlighter-rouge">ur_gazebo</code>和<code class="highlighter-rouge">ur5_moveit_config</code>是本部分所需要的内容。其中<code class="highlighter-rouge">ur_description</code>这个Package中有UR5机械臂的URDF描述文件，在<code class="highlighter-rouge">ur_gazebo</code>这个Package中有UR5机械臂在Gazebo仿真模型中的驱动文件包括一些控制关节的定义等，在<code class="highlighter-rouge">ur5_moveit_config</code>中则是实现机械臂轨迹规划的一些关键配置。下面就让我们看看如何编写launch文件使用这些Package中我们需要的部分。</p>
+
+<p>  首先在工作空间下新建一个package，我们将它命名为<code class="highlighter-rouge">ur5_grasping</code>好了，在新Package的CMakeLists.txt文件中添加这些Package作为依赖：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  cv_bridge
+  image_transport
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_visual_tools
+  roscpp
+  rospy
+  sensor_msgs
+  std_msgs
+  tf
+</code></pre></div></div>
+
+<p>  当然package.xml文件也做相应的更改，具体的可以查看附件中的文件进行参考学习。在<code class="highlighter-rouge">ur5_grasping</code>的文件夹中新建两个文件夹：<code class="highlighter-rouge">launch</code>和<code class="highlighter-rouge">scripts</code>，分别用来存放启动节点的launch文件和用来实现功能的Python文件。之后在launch文件夹下新建一个名为<code class="highlighter-rouge">ur5_grasping.launch</code>的文件用来启动节点。</p>
+
+<p>  这个launch文件需要实现的功能是启动UR5机械臂在Gazebo中的仿真模型和用于轨迹规划的moveit!模块，分别是<code class="highlighter-rouge">ur_gazebo</code>中的<code class="highlighter-rouge">ur5.launch</code>、<code class="highlighter-rouge">ur5_moveit_config</code>中的<code class="highlighter-rouge">ur5_moveit_planning_execution.launch</code>和<code class="highlighter-rouge">moveit_rviz.launch</code>文件：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;launch&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"$(find ur_gazebo)/launch/ur5_with_table_and_camera.launch"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">"sim"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/include&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"$(find ur5_moveit_config)/launch/moveit_rviz.launch"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">"config"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/include&gt;</span>
+<span class="nt">&lt;/launch&gt;</span>
+</code></pre></div></div>
+
+<p>  在调用<code class="highlighter-rouge">ur5_moveit_planning_execution.launch</code>时需要将参数<code class="highlighter-rouge">sim</code>设置为<code class="highlighter-rouge">true</code>以代表我们是在仿真环境中进行驱动的，在调用<code class="highlighter-rouge">moveit_rviz.launch</code>时将参数<code class="highlighter-rouge">config</code>设置为<code class="highlighter-rouge">true</code>可以在打开RViz时直接使用配置好的界面。注意到我们并没有调用<code class="highlighter-rouge">ur5.launch</code>这个文件，这是因为我们需要对他进行修改，为了避免对原来的文件造成影响因此新建了一个launch文件。</p>
+
+<div align="center">
+  <img src="../19/RViz界面.png" width="45%" height="45%" />
+  <img src="../19/Gazebo界面.png" width="45%" height="45%" />
+</div>
+<div align="center"> 图1  RViz示意图 &amp; Gazebo示意图 </div>
+<p>  现在启动这个launch文件，将会出现Gazebo和RViz两个界面，在RViz中可以拖动机器人末端测试moveit!是否成功启动：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch ur5_grasping ur5_grasping.launch
+</code></pre></div></div>
+
+<p>  当然现在在你们的界面中还不会显示出桌子和相机，不要着急，接下来就让我们开始添加这些。但是在此之前需要说明一点，在启动时你会发现机器人的位姿是平躺在地面上的，和图中显示的不太一样。这是UR系列机器人默认的起始位姿，调整到这个位姿是为了放置机械臂遮挡住上方相机的视线，我们可以在<code class="highlighter-rouge">/ur_description/urdf</code>中的<code class="highlighter-rouge">ur5.urdf.xacro</code>文件中修改机器人的其实位姿，调整的参数是joint中<code class="highlighter-rouge">&lt;origin&gt;</code>里的rpy角度，在调整时可以使用下面的命令打开机械臂的RViz界面进行参考：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch ur_description view_ur5.launch
+</code></pre></div></div>
+
+<p>  调整时需耐心调试角度，可以使用下图中的可视化界面拖动滑轴测试合理的角度，当然也可以直接使用课程附件中已经调整好的模型：</p>
+
+<div align="center">
+  <img src="../19/view模型.png" width="85%" height="85%" />
+</div>
+<div align="center"> 图2  view_ur5的界面 </div>
+<h2 id="添加桌子和方块">添加桌子和方块</h2>
+
+<p>  在<code class="highlighter-rouge">ur_gazebo</code>文件夹下有启动UR5机械臂Gazebo仿真模型的launch文件，<code class="highlighter-rouge">ur5.launch</code>和<code class="highlighter-rouge">ur5_joint_limited.launch</code>，而后者启动的机械臂模型是各个关节有限制角度的仿真模型，打开这个文件你会发现他不过是include了<code class="highlighter-rouge">ur5.launch</code>之后修改了参数而已：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0"?&gt;</span>
+<span class="nt">&lt;launch&gt;</span>
+  <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">"gui"</span> <span class="na">default=</span><span class="s">"true"</span> <span class="na">doc=</span><span class="s">"Starts gazebo gui"</span> <span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"$(find ur_gazebo)/launch/ur5.launch"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">"limited"</span> <span class="na">value=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">"gui"</span> <span class="na">value=</span><span class="s">"$(arg gui)"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/include&gt;</span>
+
+<span class="nt">&lt;/launch&gt;</span>
+</code></pre></div></div>
+
+<p>  为了不影响原来的结构，我们新建一个名为<code class="highlighter-rouge">ur5_with_table_and_camera.launch</code>的launch文件，将<code class="highlighter-rouge">ur5.launch</code>中的内容复制过来后修改添加世界模型的部分，将他的<code class="highlighter-rouge">world_name</code>参数的值修改为<code class="highlighter-rouge">$(find ur_gazebo)/worlds/tableObj.world</code>，也就是我们课程附件中用于描述桌子和方块的世界模型，当然文件夹和对应的文件需要提前放置在这个Package里。</p>
+
+<p>  在<code class="highlighter-rouge">tableObj.world</code>中首先引用了在<code class="highlighter-rouge">tableObj2.world</code>中的世界设置，随后使用<code class="highlighter-rouge">model</code>标签添加了两个物体，分别是box代表的桌子和Gazebo模型库中的coke_can。至此在实验环境中添加桌子和方块的任务就已经完成了，在<code class="highlighter-rouge">tableObj.world</code>中可以通过修改两个模型的<code class="highlighter-rouge">scale</code>和<code class="highlighter-rouge">pose</code>两个标签来调整桌子或方块的尺寸和起始位置。为了试验是否成功添加，可以使用刚才的命令打开Gazebo的界面进行查看：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch ur5_grasping ur5_grasping.launch
+</code></pre></div></div>
+
+<p>  值得一提的是，很多人可能在打开Gazebo时遇到长时间黑屏的问题，这是由于Gazebo的模型需要从其服务器上在线下载，为了加快打开速度可以将模型包下载到本地并解压到<code class="highlighter-rouge">~/.gazebo/models</code>文件夹下，下载的方式网上有很多就不在这里详细说明了。</p>
+
+<h2 id="添加camera插件">添加Camera插件</h2>
+
+<p>  添加Camera插件其实非常简单，相机的模型和xacro文件在网上已经是满天飞了，我们只需要坐享天成就可以了！</p>
+
+<p>  首先将附件中的sensor文件夹复制到<code class="highlighter-rouge">ur_descrption</code>的urdf文件夹下，之后再在其中新建一个<code class="highlighter-rouge">ur5_joint_limited_robot_with_camera.urdf.xacro</code>文件，接下来将<code class="highlighter-rouge">ur5_joint_limited_robot.urdf.xacro</code>中的内容复制过来，再在其中添加下面这行程序即可：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;xacro:include</span> <span class="na">filename=</span><span class="s">"$(find ur_description)/urdf/sensors/camera.urdf.xacro"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p>  这行命令的意义在于将sensor文件夹下的camera模型加载进来，而在这个模型文件中主要做了两件事情：</p>
+
+<ul>
+  <li>搭建相机的外观模型和碰撞模型等</li>
+  <li>加入Gazebo中的相机插件，使相机能够发布接收到的图像信息</li>
+</ul>
+
+<p>  在<code class="highlighter-rouge">camera.gazebo.xacro</code>中你可以通过修改插件的参数来修改相机发布图像信息的消息，也可以修改相机的其他参数。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>  至此，我们本章所需要的实验环境已经搭载完毕了，现在我们可以使用一条命令：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>roslaunch ur5_grasping ur5_grasping.launch
+</code></pre></div></div>
+
+<p>  来启动我们的实验环境，我们可以使用它通过编程实现轨迹规划，颜色识别，最后实现控制仿真模型中的机械臂末端到达通过颜色识别获取到的方块所在位置。</p>
+
+  <!-- 引入share模块 -->
+  
+  <div class="social-share-wrapper">
+    <div class="social-share"></div>
+  </div>
+
+
+<!-- share.js -->
+<script src="/assets/js/social-share.min.js"></script>
+<script>
+  socialShare('.social-share', {
+    sites: [
+      
+        'qq'
+        ,
+        
+      
+        'wechat'
+        ,
+        
+      
+        'weibo'
+        ,
+        
+      
+        'twitter'
+        ,
+        
+      
+        'facebook'
+        
+      
+    ],
+    wechatQrcodeTitle: "分享到微信朋友圈",
+    wechatQrcodeHelper: '期待在朋友圈见到这篇文章'
+  });
+</script>
+
+</div>
+
+<!-- 底部锚点 -->
+<a id="htmldown" name="htmldown"></a>
+<!-- 引入评论模块 -->
+
+
+
+    <section class="post-footer-item comment">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDI2OS8xMDgwNg=="></div>
+    </section>
+
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+
+           if (typeof LivereTower === 'function') { return; }
+
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+    </script>
+    <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    <!-- City版安装代码已完成 -->
+
+
+
+
+
+<!-- 引入goto模块 -->
+<div class="bounceInRight animated go">
+  <a title="顶部切换页面" class="gototop" href="#htmlup" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Top
+    </div>
+  </a>
+  <a title="底部有livere评论哦" class="gotobottom" href="#htmldown" target="_self">
+    <div class="box" style="font-family:'ffad_matroregular';">
+        Foot
+    </div>
+  </a>
+</div>
+
+<!-- 引入页面底部模块 -->
+<footer id="bottom">
+  <br>
+  <span>James' HomePage ©
+  
+  
+    2018
+    -
+  
+  2019
+  <br>
+  Powered by <a href="https://www.jekyll.com.cn/">Jekyll</a> | <a href="https://github.com/xukimseven/HardCandy-Jekyll">HardCandy-Jekyll</a></span>
+</footer>
+
+
+<!-- 引用wow.js的动画效果 -->
+<script src="/assets/js/wow.js"></script>
+<script>
+    var wow = new WOW({
+        boxClass: 'wow',
+        animateClass: 'animated',
+        // offset: 600,
+        mobile: true,
+        live: true
+    });
+    wow.init();
+</script>
+<!-- 页面刷新回到顶部 -->
+<script>
+    window.onbeforeunload = function(){
+        //刷新后页面自动回到顶部
+        document.documentElement.scrollTop = 0;  //ie下
+        document.body.scrollTop = 0;  //非ie
+    }
+</script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
