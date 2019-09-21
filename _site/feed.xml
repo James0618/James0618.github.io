@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-08-19T15:51:15+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">1 搭建实验环境</title><link href="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html" rel="alternate" type="text/html" title="1 搭建实验环境" /><published>2019-08-19T00:00:00+08:00</published><updated>2019-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/19/1%20%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83</id><content type="html" xml:base="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html">&lt;h1 id=&quot;搭建实验环境&quot;&gt;搭建实验环境&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-09-21T22:47:53+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">James’ HomePage</title><subtitle>这是一个初学博客的博主</subtitle><author><name>true</name></author><entry><title type="html">1 搭建实验环境</title><link href="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html" rel="alternate" type="text/html" title="1 搭建实验环境" /><published>2019-08-19T00:00:00+08:00</published><updated>2019-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2019/08/19/1%20%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83</id><content type="html" xml:base="http://localhost:4000/2019/08/19/1-%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83.html">&lt;h1 id=&quot;搭建实验环境&quot;&gt;搭建实验环境&lt;/h1&gt;
 
 &lt;p&gt;  本章将会介绍如何对机械臂进行编程控制，实现的具体任务简单来说是控制机械臂的末端到达目标位姿。要实现这一目标我们需要完成以下几部分内容：&lt;/p&gt;
 
@@ -17,6 +17,8 @@
   &lt;li&gt;在Gazebo的世界模型中添加桌子及方块&lt;/li&gt;
   &lt;li&gt;在Gazebo中使用camera插件并进行调试&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;  &lt;strong&gt;另外，本章中提到的附件可以从我的&lt;a href=&quot;https://github.com/James0618/appendix&quot;&gt;Github Repo&lt;/a&gt;中获取。&lt;/strong&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;ur5机械臂模型&quot;&gt;UR5机械臂模型&lt;/h2&gt;
 
